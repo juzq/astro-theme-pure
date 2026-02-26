@@ -17,7 +17,7 @@ tags:
 
 ## 规则内容
 ```
-# 拒绝
+# 前置
 prepend:
   - 'DOMAIN-SUFFIX,doubleclick.net,REJECT'         # 谷歌的广告展示
   - 'DOMAIN-SUFFIX,googleadservices.com,REJECT'    # 谷歌的广告追踪
@@ -27,7 +27,8 @@ prepend:
   - 'DOMAIN,cdp.cloud.unity3d.com,REJECT'          # Unity的数据分析
   - 'DOMAIN,arc.msn.com,REJECT'                    # 微软壁纸服务
   - 'DOMAIN-SUFFIX,mmstat.com,REJECT'              # 阿里的数据统计
-# 代理
+  - 'DOMAIN,dcg.microsoft.com,DIRECT'              # Windows连接到手机的地址
+# 后置
 append:
   - 'DOMAIN-SUFFIX,google.com,PROXY'               # 谷歌主站
   - 'DOMAIN-SUFFIX,google.com.hk,PROXY'            # 谷歌香港
