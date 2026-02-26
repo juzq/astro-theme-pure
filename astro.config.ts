@@ -44,6 +44,7 @@ export default defineConfig({
 
   // [Assets]
   image: {
+    domains: ['ghchart.rshah.org'], // 允许此域名的图片
     responsiveStyles: true,
     service: {
       entrypoint: 'astro/assets/services/sharp'

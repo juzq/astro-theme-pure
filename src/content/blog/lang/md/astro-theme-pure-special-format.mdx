@@ -1,0 +1,34 @@
+---
+title: astro pure主题的特殊格式
+publishDate: 2026-01-15
+description: 'markdown自身以外的格式'
+tags:
+  - markdown
+---
+
+import { Aside } from 'astro-pure/user'
+
+首先，必须是mdx格式才能使用。
+
+## 旁白
+
+首先需要导包`import { Aside } from 'astro-pure/user'`，然后添加如下标签：
+
+```
+<Aside type='tip' title='Try this focus exercise'>
+  Test aside.....
+</Aside>
+```
+其中，type可以是："note", "tip", "caution", "danger"
+<Aside type='note' title='Try this focus exercise'>
+  note aside.....
+</Aside>
+<Aside type='tip' title='Try this focus exercise'>
+  tip aside.....
+</Aside>
+<Aside type='caution' title='Try this focus exercise'>
+  caution aside.....
+</Aside>
+<Aside type='danger' title='Try this focus exercise'>
+  danger aside.....
+</Aside>
