@@ -40,7 +40,7 @@ export default defineConfig({
   output: 'static',
   // Local (standalone)
   // adapter: node({ mode: 'standalone' }),
-  // output: 'server',
+  // output: 'server',x
 
   // [Assets]
   image: {
