@@ -70,5 +70,6 @@ append:
   - 'DOMAIN-SUFFIX,mega.nz,PROXY'                  # mega
   - 'DOMAIN-SUFFIX,hostr.co,PROXY'                 # hostr
   - 'DOMAIN-SUFFIX,dropbox.com,PROXY'              # dropbox
+  - 'DOMAIN-SUFFIX,vercel.app,PROXY'               # vercel
 delete: []
 ```
