@@ -2,7 +2,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "packageManager": "pnpm@10.30.2",
   "name": "astro-theme-pure",
   "type": "module",
   "version": "4.1.2",
