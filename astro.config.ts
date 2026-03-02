@@ -37,13 +37,14 @@ export default defineConfig({
   // [Adapter]
   // https://docs.astro.build/en/guides/deploy/
   adapter: vercel(),
-  output: 'server',
+  output: 'static',
   // Local (standalone)
   // adapter: node({ mode: 'standalone' }),
   // output: 'server',
 
   // [Assets]
   image: {
+    domains: ['ghchart.rshah.org'], // 允许此域名的图片
     responsiveStyles: true,
     service: {
       entrypoint: 'astro/assets/services/sharp'
