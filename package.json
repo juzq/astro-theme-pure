@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.6",
-    "@astrojs/vercel": "^9.0.2",
     "@waline/client": "^3.13.0",
     "astro": "^5.1.0",
     "astro-pure": "1.4.0",
