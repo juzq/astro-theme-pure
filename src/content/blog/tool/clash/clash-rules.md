@@ -71,5 +71,6 @@ append:
   - 'DOMAIN-SUFFIX,hostr.co,PROXY'                 # hostr
   - 'DOMAIN-SUFFIX,dropbox.com,PROXY'              # dropbox
   - 'DOMAIN-SUFFIX,vercel.app,PROXY'               # vercel
+  - 'DOMAIN,cdn.jsdelivr.net,PROXY'                # jsdelivr
 delete: []
 ```
