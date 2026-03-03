@@ -130,5 +130,11 @@ export default defineConfig({
         subsets: ['latin']
       }
     ]
-  }
+  },
+  // ... 其他配置
+  vite: {
+    server: {
+      hmr: false, // 彻底禁用热更新
+    },
+  },
 })
