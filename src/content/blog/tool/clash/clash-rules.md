@@ -19,15 +19,18 @@ tags:
 ```
 # 前置
 prepend:
-  - 'DOMAIN-SUFFIX,doubleclick.net,REJECT'         # 谷歌的广告展示
-  - 'DOMAIN-SUFFIX,googleadservices.com,REJECT'    # 谷歌的广告追踪
-  - 'DOMAIN-SUFFIX,google-analytics.com,REJECT'    # 谷歌的数据分析
-  - 'DOMAIN-SUFFIX,googletagmanager.com,REJECT'    # 谷歌跟踪标记
-  - 'DOMAIN,nexus-websocket-a.intercom.io,REJECT'  # Clash Rerge 一直在连接
-  - 'DOMAIN,cdp.cloud.unity3d.com,REJECT'          # Unity的数据分析
-  - 'DOMAIN,arc.msn.com,REJECT'                    # 微软壁纸服务
-  - 'DOMAIN-SUFFIX,mmstat.com,REJECT'              # 阿里的数据统计
-  - 'DOMAIN,dcg.microsoft.com,DIRECT'              # Windows连接到手机的地址
+  - 'DOMAIN-SUFFIX,doubleclick.net,REJECT'               # 谷歌的广告展示
+  - 'DOMAIN-SUFFIX,googleadservices.com,REJECT'          # 谷歌的广告追踪
+  - 'DOMAIN-SUFFIX,google-analytics.com,REJECT'          # 谷歌的数据分析
+  - 'DOMAIN-SUFFIX,googletagmanager.com,REJECT'          # 谷歌跟踪标记
+  - 'DOMAIN,nexus-websocket-a.intercom.io,REJECT'        # Clash Rerge 一直在连接
+  - 'DOMAIN,cdp.cloud.unity3d.com,REJECT'                # Unity的数据分析
+  - 'DOMAIN,arc.msn.com,REJECT'                          # 微软壁纸服务
+  - 'DOMAIN-SUFFIX,mmstat.com,REJECT'                    # 阿里的数据统计
+  - 'DOMAIN,localhost.weixin.qq.com,REJECT'              # 微信一直在连接
+  - 'DOMAIN,functional.events.data.microsoft.com,REJECT' # 微软的数据收集
+  - 'DOMAIN,dcg.microsoft.com,DIRECT'                    # Windows连接到手机的地址
+  - 'DOMAIN,edge.microsoft.com,DIRECT'                   # edge更新
 # 后置
 append:
   - 'DOMAIN-SUFFIX,google.com,PROXY'               # 谷歌主站
