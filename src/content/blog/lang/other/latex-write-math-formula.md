@@ -3,7 +3,7 @@ title: 用LaTeX书写数学公式
 publishDate: 2019-02-23
 description: '为了更方便的书写数学公式，有多种语法支持，主要有TeX/LaTeX, MathML和AsciiMath，目前使用最多的是LaTeX'
 tags:
-  - LaTeX
+  - other
 ---
 
 
