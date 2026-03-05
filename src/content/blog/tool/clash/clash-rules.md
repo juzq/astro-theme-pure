@@ -58,7 +58,9 @@ append:
   - 'DOMAIN-SUFFIX,x.com,PROXY'                    # X
   - 'DOMAIN-SUFFIX,twimg.com,PROXY'                # X静态资源
   - 'DOMAIN-SUFFIX,twitter.com,PROXY'              # X原域名
-  - 'DOMAIN-SUFFIX,t.co,PROXY'                     #X短域名
+  - 'DOMAIN-SUFFIX,t.co,PROXY'                     # X短域名
+  - 'DOMAIN-SUFFIX,telegram.org,PROXY'             # telegram
+  - 'DOMAIN-SUFFIX,t.me,PROXY'                     # telegram短域名
   - 'DOMAIN-SUFFIX,wikipedia.org,PROXY'            # 维基百科
   - 'DOMAIN-SUFFIX,wikimedia.org,PROXY'            # 维基媒体
   - 'DOMAIN-SUFFIX,reddit.com,PROXY'               # reddit
