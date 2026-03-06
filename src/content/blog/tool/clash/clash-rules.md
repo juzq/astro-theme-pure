@@ -29,6 +29,8 @@ prepend:
   - 'DOMAIN-SUFFIX,mmstat.com,REJECT'                    # 阿里的数据统计
   - 'DOMAIN,localhost.weixin.qq.com,REJECT'              # 微信一直在连接
   - 'DOMAIN,functional.events.data.microsoft.com,REJECT' # 微软的数据收集
+  - 'DOMAIN,watson.events.data.microsoft.com,REJECT'     # 微软的故障上报
+  - 'DOMAIN,mobile.events.data.microsoft.com,REJECT'     # 微软的移动设备上报
   - 'DOMAIN,dcg.microsoft.com,DIRECT'                    # Windows连接到手机的地址
   - 'DOMAIN,edge.microsoft.com,DIRECT'                   # edge更新
 # 后置
