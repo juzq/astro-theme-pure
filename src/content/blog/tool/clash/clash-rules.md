@@ -78,6 +78,8 @@ append:
   - 'DOMAIN-SUFFIX,hostr.co,PROXY'                 # hostr
   - 'DOMAIN-SUFFIX,dropbox.com,PROXY'              # dropbox
   - 'DOMAIN-SUFFIX,vercel.app,PROXY'               # vercel
-  - 'DOMAIN,cdn.jsdelivr.net,PROXY'                # jsdelivr
+  - 'DOMAIN-SUFFIX,cdn.jsdelivr.net,PROXY'         # jsdelivr
+  - 'DOMAIN-SUFFIX,mongodb.com,PROXY'              # mongodb
+  - 'DOMAIN-SUFFIX,oracle.com,PROXY'               # oracle
 delete: []
 ```
