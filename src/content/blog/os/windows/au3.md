@@ -69,25 +69,25 @@ EndIf
 
 * _Crypt_HashData：数据串计算哈希
 
-  ```
+```
 
     #include <Crypt.au3>
 
     _Crypt_DeriveKey ( $vPassword, $iAlgID [, $iHashPasswordID = $CALG_MD5] )
 
-  ```
+```
 
   
 
 * _Crypt_HashFile：文件计算哈希
 
-  ```
+```
 
     #include <Crypt.au3>
 
     _Crypt_HashFile ( $sFilePath, $iAlgID )
 
-  ```
+```
 
   
 
