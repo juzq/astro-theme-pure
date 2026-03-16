@@ -1,9 +1,9 @@
 ---
 title: Golang项目在fork后的注意事项
 publishDate: 2026-02-24
-description: '如果fork后还被其他项目引用，会产生一系列问题。'
+description: 如果fork后还被其他项目引用，会产生一系列问题
 tags:
-  - Golang
+  - golang
 ---
 
 
@@ -19,12 +19,12 @@ go get github.com/BBB/project
 ```
 拉取之后，会报错，因为项目名字BBB/project与该项目中的go.mod定义不一致。
 
-### 方案一
+### 修改依赖项目名
 可以直接将原项目go.mod中的module改成BBB/project。
 
 但是项目中可能还引用了本项目的包，因此要把所有import都改成BBB/project。
 
-### 方案二
+### 使用replace语句
 将依赖这个项目的go.mod加入如下语句
 ```
 replace github.com/AAA/project => github.com/BBB/project main
