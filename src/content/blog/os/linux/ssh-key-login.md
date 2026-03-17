@@ -7,7 +7,7 @@ tags:
   - SSH
 ---
 
-使用前需要先用[[blog/os/linux/generate-ssh-key|generate-ssh-key]]创建ssh-key
+使用前需要先用[[generate-ssh-key]]创建ssh-key
 ## 连接Linux服务器
 ### 步骤
 1. 进入用户目录：`cd`或`cd /home/xxx`
