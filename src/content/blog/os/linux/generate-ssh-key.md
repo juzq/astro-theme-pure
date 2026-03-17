@@ -1,7 +1,7 @@
 ---
 title: 生成SSH密钥
 publishDate: 2020-05-20
-description: '包含多个系统的生成方法'
+description: 包含多个系统的生成方法
 tags:
   - SSH
 ---
@@ -40,7 +40,3 @@ Enter file in which to save the key (/c/Users/user/.ssh/id_ed25519):
 > 设置密码后，每次使用密钥时都需要输入密码后才能使用，如果不设置密码，直接按两次*Enter*即可。
 5. 找到生成的密钥文件
 文件会出现在第3步中指定的位置，xxx.pub为公钥，存放在服务器上；xxx为私钥，存放在自己电脑上，可以连接有对应公钥的服务器。
-
-> 参考：<https://docs.github.com/zh/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent>
-
-> 参考：<https://docs.gitlab.com/ee/user/ssh.html#generate-an-ssh-key-pair>
