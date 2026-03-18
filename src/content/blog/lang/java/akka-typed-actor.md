@@ -3,7 +3,7 @@ title: Akka类型化的Actor
 publishDate: 2021-12-20
 description: 类型化Actor已经是akka官方默认推荐使用的actor。
 tags:
-  - akka
+  - java
 ---
 
 从akka 2.6开始，[Typed Actor](https://doc.akka.io/docs/akka/current/typed/actors.html)（类型化的Actor）已经成为默认的Actor，原有的Actor被命名为为[Classic Actor](https://doc.akka.io/docs/akka/current/actors.html)（经典的Actor）。akka推荐新项目直接使用typed actor，因为其提升了类型安全，并且将Java API和Scala API分离，对开发者更加友好。
