@@ -3,7 +3,7 @@ title: 通信协议多维度对比
 publishDate: 2019-01-08
 description: 网络程序开发就离不开客户端与服务器，而客户端与服务器交互的核心之一就是通信协议
 tags:
-  - java
+  - protocol
 ---
 
 # 背景
