@@ -32,9 +32,13 @@ For more information visit https://opencode.ai/docs
 ```
 安装完成后会看到已经将 opencode 加入了环境变量，可直接运行（开新的终端）。
 ### Windows
-1. 安装 Node.js，会附带安装 npm。
+1. 安装 [Node.js](https://nodejs.org/en/download)，会附带安装 npm。
 2. 使用命令`npm install -g opencode-ai`。
 
+注意：如果是在powershell中运行npm，则需要使用`npm.cmd`，因为Powershell默认的执行策略是Restricted，禁止执行脚本文件，可使用如下命令修改。
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 ## 运行
 
 直接在命令行中输入`opencode`即可运行。
