@@ -1,0 +1,361 @@
+---
+import PageLayout from '@/layouts/BaseLayout.astro'
+
+const title = 'Tools'
+---
+
+<PageLayout meta={{ title }}>
+  <main class='flex w-full flex-col items-center px-4 py-8'>
+    <div class='w-full max-w-4xl bg-background border rounded-lg shadow-sm'>
+      <!-- 导航栏 -->
+      <nav class='flex border-b border-border'>
+        <button
+          data-tab='format'
+          class='tab-button flex-1 py-3 px-6 text-sm font-medium transition-colors'
+        >
+          字符串格式化
+        </button>
+        <button
+          data-tab='encoder'
+          class='tab-button flex-1 py-3 px-6 text-sm font-medium transition-colors'
+        >
+          URL 编码
+        </button>
+      </nav>
+
+      <!-- 字符串格式化内容 -->
+      <div id='tab-format' class='tab-content p-6'>
+        <!-- 格式选择 -->
+        <div class='mb-4'>
+          <label class='block text-sm font-medium mb-2'>字符串格式</label>
+          <div class='flex gap-4'>
+            <label class='flex items-center gap-2 cursor-pointer'>
+              <input type='radio' name='format-type' value='json' checked class='w-4 h-4' />
+              <span>JSON</span>
+            </label>
+            <label class='flex items-center gap-2 cursor-pointer'>
+              <input type='radio' name='format-type' value='xml' class='w-4 h-4' />
+              <span>XML</span>
+            </label>
+            <label class='flex items-center gap-2 cursor-pointer'>
+              <input type='radio' name='format-type' value='protobuf' class='w-4 h-4' />
+              <span>Protobuf</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 按钮组 -->
+        <div class='flex gap-4'>
+          <button
+            id='format-btn'
+            class='px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors'
+          >
+            格式化
+          </button>
+          <button
+            id='clear-btn'
+            class='px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors'
+          >
+            清空
+          </button>
+        </div>
+
+        <!-- 搜索框 -->
+        <div class='mb-4'>
+          <label class='block text-sm font-medium mb-2'>搜索</label>
+          <input
+            type='text'
+            id='search-input'
+            placeholder='输入要搜索的文本...'
+            class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+          />
+        </div>
+
+        <!-- 文本区域 -->
+        <div class='mb-4'>
+          <label class='block text-sm font-medium mb-2'>文本</label>
+          <textarea
+            id='text-input'
+            rows='20'
+            placeholder='在此粘贴文本...'
+            class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-y'
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- URL 编码内容（占位） -->
+      <div id='tab-encoder' class='tab-content p-6 hidden'>
+        <p class='text-muted-foreground'>URL 编码功能正在开发中...</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const formatBtn = document.getElementById('format-btn')
+    const clearBtn = document.getElementById('clear-btn')
+    const searchInput = document.getElementById('search-input') as HTMLInputElement
+    const textInput = document.getElementById('text-input') as HTMLTextAreaElement
+    const formatRadios = document.querySelectorAll(
+      "input[name='format-type']"
+    ) as NodeListOf<HTMLInputElement>
+    const tabButtons = document.querySelectorAll('.tab-button')
+    const tabContents = document.querySelectorAll('.tab-content')
+
+    // 页签切换
+    tabButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const tabName = button.dataset.tab
+        tabButtons.forEach((btn) => {
+          btn.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600')
+        })
+        tabContents.forEach((content) => content.classList.add('hidden'))
+        button.classList.add('border-b-2', 'border-blue-600', 'text-blue-600')
+        document.getElementById(`tab-${tabName}`)?.classList.remove('hidden')
+      })
+    })
+
+    // 初始化选中第一个页签
+    tabButtons[0].classList.add('border-b-2', 'border-blue-600', 'text-blue-600')
+    document.getElementById('tab-format')?.classList.remove('hidden')
+
+    // 清空按钮
+    clearBtn.addEventListener('click', () => {
+      textInput.value = ''
+    })
+
+    // 格式化按钮
+    formatBtn.addEventListener('click', () => {
+      const formatType = Array.from(formatRadios).find((radio) => radio.checked)?.value
+      const text = textInput.value
+
+      if (!text.trim()) {
+        alert('请输入要格式化的文本')
+        return
+      }
+
+      try {
+        switch (formatType) {
+          case 'json':
+            formatJSON()
+            break
+          case 'xml':
+            formatXML()
+            break
+          case 'protobuf':
+            formatProtobuf()
+            break
+        }
+      } catch (error) {
+        alert('格式化失败：' + (error as Error).message)
+      }
+    })
+
+    // JSON 格式化
+    function formatJSON() {
+      try {
+        const parsed = JSON.parse(textInput.value)
+        textInput.value = JSON.stringify(parsed, null, 2)
+      } catch {
+        alert('无效的 JSON 格式')
+      }
+    }
+
+    // XML 格式化
+    function formatXML() {
+      try {
+        const parser = new DOMParser()
+        const xmlDoc = parser.parseFromString(textInput.value, 'text/xml')
+
+        if (xmlDoc.querySelector('parsererror')) {
+          throw new Error('无效的 XML 格式')
+        }
+
+        const serializer = new XMLSerializer()
+        const formatted = serializer.serializeToString(xmlDoc)
+
+        textInput.value = formatXMLIndent(formatted)
+      } catch (error) {
+        alert('无效的 XML 格式')
+      }
+    }
+
+    // 格式化 XML 缩进
+    function formatXMLIndent(xml: string): string {
+      const reg = /(>)(<)(\/*)/g
+      xml = xml.replace(reg, '$1\r\n$2$3')
+      const pad = 0
+      const nodes = xml.split('\r\n')
+      let indent = ''
+      nodes.forEach((node) => {
+        const i = node.search(/[\s<\/>]/)
+        if (i < 0) {
+          return
+        }
+        const level = node.substring(0, i).length
+        const padStr = '  '.repeat(level - pad)
+        indent = padStr
+        nodes[i] = padStr + node.substring(i)
+      })
+      return nodes.join('\r\n')
+    }
+
+    // Protobuf 格式化
+    function formatProtobuf() {
+      const text = textInput.value.trim()
+      if (!text) {
+        alert('请输入 Protobuf 内容')
+        return
+      }
+
+      try {
+        const formatted = formatProtobufMessage(text)
+        textInput.value = formatted
+      } catch (error) {
+        alert('格式化失败：' + (error as Error).message)
+      }
+    }
+
+    // 格式化 Protobuf 消息
+    function formatProtobufMessage(text: string): string {
+      const lines = text.split('\n')
+      const result: string[] = []
+      let indent = 0
+
+      for (const line of lines) {
+        const trimmedLine = line.trim()
+
+        // 跳过空行
+        if (!trimmedLine) {
+          continue
+        }
+
+        // 检测消息开始
+        if (trimmedLine.startsWith('message ')) {
+          result.push(''.repeat(indent) + trimmedLine)
+          indent++
+        }
+        // 检测字段定义
+        else if (
+          trimmedLine.startsWith('repeated ') ||
+          trimmedLine.startsWith('required ') ||
+          trimmedLine.startsWith('optional ')
+        ) {
+          const fieldMatch = trimmedLine.match(
+            /^(repeated|required|optional)\s+(\w+)\s+(\w+)\s*=\s*(\d+)(?:;\s*\/\/\s*(.+))?/
+          )
+          if (fieldMatch) {
+            const [, type, name, number, comment] = fieldMatch
+            result.push(
+              ''.repeat(indent) +
+                `${type} ${typeMap[type]} ${name} = ${number}; // ${comment || ''}`
+            )
+          }
+        }
+        // 检测枚举
+        else if (trimmedLine.startsWith('enum ')) {
+          result.push(''.repeat(indent) + trimmedLine)
+          indent++
+        }
+        // 检测枚举值
+        else if (trimmedLine.startsWith(' ') && trimmedLine.match(/^  \w+\s*=\s*\d+;$/)) {
+          result.push(''.repeat(indent) + trimmedLine)
+        }
+        // 检测消息结束
+        else if (trimmedLine === '}') {
+          indent--
+        }
+        // 检测服务定义
+        else if (trimmedLine.startsWith('service ')) {
+          result.push(''.repeat(indent) + trimmedLine)
+          indent++
+        }
+        // 检测 RPC 方法
+        else if (trimmedLine.startsWith('rpc ')) {
+          const methodMatch = trimmedLine.match(
+            /rpc\s+(\w+)\s*\(([^)]+)\)\s*returns\s*\(([^)]+)\);/
+          )
+          if (methodMatch) {
+            const [, name, requestType, responseType] = methodMatch
+            result.push(
+              ''.repeat(indent) + `rpc ${name}(${requestType}) returns (${responseType});`
+            )
+          }
+        }
+        // 检测服务结束
+        else if (trimmedLine === '}') {
+          indent--
+        }
+        // 普通行（可能是注释或空行）
+        else if (trimmedLine.startsWith('//') || trimmedLine.startsWith('#')) {
+          result.push(''.repeat(indent) + trimmedLine)
+        }
+        // 其他行
+        else {
+          result.push(''.repeat(indent) + trimmedLine)
+        }
+      }
+
+      return result.join('\n')
+    }
+
+    // Protobuf 类型映射
+    const typeMap: Record<string, string> = {
+      int32: 'int32',
+      int64: 'int64',
+      uint32: 'uint32',
+      uint64: 'uint64',
+      sint32: 'sint32',
+      sint64: 'sint64',
+      fixed32: 'fixed32',
+      fixed64: 'fixed64',
+      sfixed32: 'sfixed32',
+      sfixed64: 'sfixed64',
+      float: 'float',
+      double: 'double',
+      bool: 'bool',
+      string: 'string',
+      bytes: 'bytes'
+    }
+
+    // 实时搜索
+    let debounceTimer: ReturnType<typeof setTimeout>
+    searchInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer)
+      debounceTimer = setTimeout(() => {
+        performSearch()
+      }, 300)
+    })
+
+    function performSearch() {
+      const search = searchInput.value.toLowerCase()
+      const lines = textInput.value.split('\n')
+      const result: string[] = []
+
+      for (const line of lines) {
+        const trimmedLine = line.trim()
+        if (trimmedLine && trimmedLine.toLowerCase().includes(search)) {
+          result.push(line)
+        }
+      }
+
+      if (search) {
+        textInput.value = result.join('\n')
+      }
+    }
+  </script>
+
+  <style>
+    .tab-button {
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab-button:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .tab-button.active {
+      border-bottom-color: #2563eb;
+      color: #2563eb;
+    }
+  </style>
+</PageLayout>
