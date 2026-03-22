@@ -25,9 +25,9 @@ const title = 'Tools'
 
       <!-- 字符串格式化内容 -->
       <div id='tab-format' class='tab-content p-6'>
-        <!-- 格式选择 -->
-        <div class='mb-4'>
-          <label class='block text-sm font-medium mb-2'>字符串格式</label>
+        <!-- 格式选择和按钮 -->
+        <div class='mb-4 flex items-center gap-4'>
+          <label class='block text-sm font-medium mb-2 min-w-[80px]'>字符串格式</label>
           <div class='flex gap-4'>
             <label class='flex items-center gap-2 cursor-pointer'>
               <input type='radio' name='format-type' value='json' checked class='w-4 h-4' />
@@ -42,33 +42,36 @@ const title = 'Tools'
               <span>Protobuf</span>
             </label>
           </div>
+          <div class='flex gap-2 ml-auto'>
+            <button
+              id='format-btn'
+              class='px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm'
+            >
+              格式化
+            </button>
+            <button
+              id='clear-btn'
+              class='px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm'
+            >
+              清空
+            </button>
+          </div>
         </div>
 
-        <!-- 按钮组 -->
-        <div class='flex gap-4'>
-          <button
-            id='format-btn'
-            class='px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors'
-          >
-            格式化
-          </button>
-          <button
-            id='clear-btn'
-            class='px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors'
-          >
-            清空
-          </button>
-        </div>
-
-        <!-- 搜索框 -->
-        <div class='mb-4'>
-          <label class='block text-sm font-medium mb-2'>搜索</label>
-          <input
-            type='text'
-            id='search-input'
-            placeholder='输入要搜索的文本...'
-            class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-          />
+        <!-- 搜索框和匹配信息 -->
+        <div class='mb-4 flex gap-4'>
+          <div class='flex-1'>
+            <label class='block text-sm font-medium mb-2'>搜索</label>
+            <input
+              type='text'
+              id='search-input'
+              placeholder='输入要搜索的文本... (回车跳转下一处)'
+              class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            />
+          </div>
+          <div class='flex items-end pb-2'>
+            <span id='match-info' class='text-sm text-muted-foreground'>0 / 0</span>
+          </div>
         </div>
 
         <!-- 文本区域 -->
@@ -95,6 +98,7 @@ const title = 'Tools'
     const clearBtn = document.getElementById('clear-btn')
     const searchInput = document.getElementById('search-input') as HTMLInputElement
     const textInput = document.getElementById('text-input') as HTMLTextAreaElement
+    const matchInfo = document.getElementById('match-info') as HTMLSpanElement
     const formatRadios = document.querySelectorAll(
       "input[name='format-type']"
     ) as NodeListOf<HTMLInputElement>
@@ -111,6 +115,9 @@ const title = 'Tools'
         tabContents.forEach((content) => content.classList.add('hidden'))
         button.classList.add('border-b-2', 'border-blue-600', 'text-blue-600')
         document.getElementById(`tab-${tabName}`)?.classList.remove('hidden')
+        // 切换页签时清除搜索状态
+        searchInput.value = ''
+        matchInfo.textContent = '0 / 0'
       })
     })
 
@@ -121,6 +128,8 @@ const title = 'Tools'
     // 清空按钮
     clearBtn.addEventListener('click', () => {
       textInput.value = ''
+      searchInput.value = ''
+      matchInfo.textContent = '0 / 0'
     })
 
     // 格式化按钮
@@ -145,6 +154,9 @@ const title = 'Tools'
             formatProtobuf()
             break
         }
+        // 格式化后清除搜索
+        searchInput.value = ''
+        matchInfo.textContent = '0 / 0'
       } catch (error) {
         alert('格式化失败：' + (error as Error).message)
       }
@@ -179,24 +191,43 @@ const title = 'Tools'
       }
     }
 
-    // 格式化 XML 缩进
+    // 格式化 XML 缩进（改进版）
     function formatXMLIndent(xml: string): string {
-      const reg = /(>)(<)(\/*)/g
-      xml = xml.replace(reg, '$1\r\n$2$3')
-      const pad = 0
-      const nodes = xml.split('\r\n')
-      let indent = ''
-      nodes.forEach((node) => {
-        const i = node.search(/[\s<\/>]/)
-        if (i < 0) {
-          return
+      const lines = xml.split('\n')
+      const result: string[] = []
+      let indentLevel = 0
+      const indentSize = 2
+
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
+        const trimmed = line.trim()
+
+        // 跳过空行
+        if (!trimmed) {
+          result.push('')
+          continue
         }
-        const level = node.substring(0, i).length
-        const padStr = '  '.repeat(level - pad)
-        indent = padStr
-        nodes[i] = padStr + node.substring(i)
-      })
-      return nodes.join('\r\n')
+
+        // 计算缩进级别
+        const openTagMatch = trimmed.match(/^<\/?(\w+)/)
+        if (openTagMatch) {
+          const tagName = openTagMatch[1]
+
+          // 检查是否是闭合标签
+          if (trimmed.startsWith('</')) {
+            indentLevel--
+          } else if (!trimmed.endsWith('/>')) {
+            // 不是自闭合标签，增加缩进
+            indentLevel++
+          }
+        }
+
+        // 添加缩进
+        const indent = '  '.repeat(indentLevel)
+        result.push(indent + trimmed)
+      }
+
+      return result.join('\n')
     }
 
     // Protobuf 格式化
@@ -215,11 +246,12 @@ const title = 'Tools'
       }
     }
 
-    // 格式化 Protobuf 消息
+    // 格式化 Protobuf 消息内容（只包含消息定义，去掉其他内容）
     function formatProtobufMessage(text: string): string {
       const lines = text.split('\n')
       const result: string[] = []
       let indent = 0
+      let inMessage = false
 
       for (const line of lines) {
         const trimmedLine = line.trim()
@@ -231,15 +263,18 @@ const title = 'Tools'
 
         // 检测消息开始
         if (trimmedLine.startsWith('message ')) {
+          inMessage = true
           result.push(''.repeat(indent) + trimmedLine)
           indent++
         }
-        // 检测字段定义
-        else if (
-          trimmedLine.startsWith('repeated ') ||
-          trimmedLine.startsWith('required ') ||
-          trimmedLine.startsWith('optional ')
-        ) {
+        // 检测消息结束
+        else if (trimmedLine === '}') {
+          indent--
+          inMessage = false
+        }
+        // 只在消息块内处理字段
+        else if (inMessage) {
+          // 检测字段定义
           const fieldMatch = trimmedLine.match(
             /^(repeated|required|optional)\s+(\w+)\s+(\w+)\s*=\s*(\d+)(?:;\s*\/\/\s*(.+))?/
           )
@@ -250,48 +285,24 @@ const title = 'Tools'
                 `${type} ${typeMap[type]} ${name} = ${number}; // ${comment || ''}`
             )
           }
-        }
-        // 检测枚举
-        else if (trimmedLine.startsWith('enum ')) {
-          result.push(''.repeat(indent) + trimmedLine)
-          indent++
-        }
-        // 检测枚举值
-        else if (trimmedLine.startsWith(' ') && trimmedLine.match(/^  \w+\s*=\s*\d+;$/)) {
-          result.push(''.repeat(indent) + trimmedLine)
-        }
-        // 检测消息结束
-        else if (trimmedLine === '}') {
-          indent--
-        }
-        // 检测服务定义
-        else if (trimmedLine.startsWith('service ')) {
-          result.push(''.repeat(indent) + trimmedLine)
-          indent++
-        }
-        // 检测 RPC 方法
-        else if (trimmedLine.startsWith('rpc ')) {
-          const methodMatch = trimmedLine.match(
-            /rpc\s+(\w+)\s*\(([^)]+)\)\s*returns\s*\(([^)]+)\);/
-          )
-          if (methodMatch) {
-            const [, name, requestType, responseType] = methodMatch
-            result.push(
-              ''.repeat(indent) + `rpc ${name}(${requestType}) returns (${responseType});`
-            )
+          // 检测枚举值
+          else if (trimmedLine.match(/^  \w+\s*=\s*\d+;$/)) {
+            result.push(''.repeat(indent) + trimmedLine)
           }
-        }
-        // 检测服务结束
-        else if (trimmedLine === '}') {
-          indent--
-        }
-        // 普通行（可能是注释或空行）
-        else if (trimmedLine.startsWith('//') || trimmedLine.startsWith('#')) {
-          result.push(''.repeat(indent) + trimmedLine)
-        }
-        // 其他行
-        else {
-          result.push(''.repeat(indent) + trimmedLine)
+          // 检测嵌套消息开始
+          else if (trimmedLine.startsWith('message ')) {
+            result.push(''.repeat(indent) + trimmedLine)
+            indent++
+          }
+          // 检测嵌套消息结束
+          else if (trimmedLine === '}') {
+            indent--
+          }
+          // 其他行（如注释）直接保留
+          else if (trimmedLine.startsWith('//') || trimmedLine.startsWith('#')) {
+            result.push(''.repeat(indent) + trimmedLine)
+          }
+          // 忽略其他内容
         }
       }
 
@@ -317,7 +328,11 @@ const title = 'Tools'
       bytes: 'bytes'
     }
 
-    // 实时搜索
+    // 搜索相关
+    let currentMatchIndex = 0
+    let allMatches: RegExpMatchArray | null = null
+
+    // 输入事件（防抖）
     let debounceTimer: ReturnType<typeof setTimeout>
     searchInput.addEventListener('input', () => {
       clearTimeout(debounceTimer)
@@ -326,22 +341,66 @@ const title = 'Tools'
       }, 300)
     })
 
+    // 回车键跳转到下一个匹配项
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        moveToNextMatch()
+      }
+    })
+
     function performSearch() {
-      const search = searchInput.value.toLowerCase()
-      const lines = textInput.value.split('\n')
-      const result: string[] = []
-
-      for (const line of lines) {
-        const trimmedLine = line.trim()
-        if (trimmedLine && trimmedLine.toLowerCase().includes(search)) {
-          result.push(line)
-        }
-      }
-
-      if (search) {
-        textInput.value = result.join('\n')
-      }
+      const searchText = searchInput.value.trim()
+      const text = textInput.value
+      allMatches = searchText
+        ? text.match(new RegExp(searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'))
+        : null
+      currentMatchIndex = 0
+      updateMatchDisplay()
     }
+
+    function moveToNextMatch() {
+      if (!allMatches || allMatches.length === 0) {
+        return
+      }
+
+      currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
+      highlightMatch(allMatches[currentMatchIndex])
+    }
+
+    function updateMatchDisplay() {
+      if (!allMatches || allMatches.length === 0) {
+        matchInfo.textContent = '0 / 0'
+        return
+      }
+
+      matchInfo.textContent = `${currentMatchIndex + 1} / ${allMatches.length}`
+    }
+
+    function highlightMatch(matchText: string) {
+      const text = textInput.value
+      const searchPattern = searchInput.value.trim()
+
+      if (!searchPattern) {
+        textInput.value = text
+        return
+      }
+
+      // 创建高亮标记
+      const regex = new RegExp(
+        searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+        'gi'
+      )
+
+      // 替换所有匹配项为高亮格式
+      textInput.value = text.replace(regex, (match) => {
+        return `<mark class="bg-yellow-200 dark:bg-yellow-900/50 px-1 rounded">${match}</mark>`
+      })
+    }
+
+    // 初始化
+    searchInput.value = ''
+    matchInfo.textContent = '0 / 0'
   </script>
 
   <style>
@@ -356,6 +415,10 @@ const title = 'Tools'
     .tab-button.active {
       border-bottom-color: #2563eb;
       color: #2563eb;
+    }
+
+    mark {
+      font-weight: 500;
     }
   </style>
 </PageLayout>
