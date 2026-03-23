@@ -65,7 +65,7 @@ const title = 'Tools'
             <input
               type='text'
               id='search-input'
-              placeholder='输入要搜索的文本... (回车跳转下一处)'
+              placeholder=''
               class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
           </div>
@@ -86,8 +86,8 @@ const title = 'Tools'
           <textarea
             id='text-input'
             rows='20'
-            placeholder='在此粘贴文本...'
-            class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-y'
+            placeholder=''
+            class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono resize-y'
           ></textarea>
         </div>
       </div>
@@ -360,6 +360,8 @@ const title = 'Tools'
         }
         // 显示当前匹配项（从第一个开始）
         showHighlightAndScroll()
+        // 更新显示
+        updateMatchDisplay()
         // 准备下一次跳转
         currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
       }
@@ -373,6 +375,8 @@ const title = 'Tools'
       }
       // 显示当前匹配项
       showHighlightAndScroll()
+      // 更新显示
+      updateMatchDisplay()
       // 准备下一次跳转
       currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
     })
@@ -392,9 +396,10 @@ const title = 'Tools'
         return
       }
 
-      updateMatchDisplay()
-      // 显示高亮并滚动到匹配项
+      // 显示当前匹配项
       showHighlightAndScroll()
+      // 更新显示
+      updateMatchDisplay()
       // 准备下一次跳转
       currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
     }
@@ -418,13 +423,18 @@ const title = 'Tools'
         return
       }
 
-      // 找到匹配项的位置
+      // 找到匹配项的位置，使用非全局正则表达式避免lastIndex问题
       const regex = new RegExp(searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
+      regex.lastIndex = 0 // 重置lastIndex
 
       let match
       let matches = []
       while ((match = regex.exec(text)) !== null) {
         matches.push({ start: match.index, end: match.index + match[0].length })
+        // 避免无限循环
+        if (match.index === regex.lastIndex) {
+          regex.lastIndex++
+        }
       }
 
       // 如果有匹配项，显示高亮并滚动
@@ -465,6 +475,13 @@ const title = 'Tools'
 
     mark {
       font-weight: 500;
+    }
+
+    /* 统一搜索框和文本框的字体 */
+    #search-input,
+    #text-input {
+      font-family: inherit;
+      font-size: 1rem;
     }
 
     /* 自定义滚动条样式 */
