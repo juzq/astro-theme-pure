@@ -83,12 +83,24 @@ const title = 'Tools'
         <!-- 文本区域 -->
         <div class='mb-4'>
           <label class='block text-sm font-medium mb-2'>文本</label>
-          <textarea
-            id='text-input'
-            rows='20'
-            placeholder=''
-            class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono resize-y'
-          ></textarea>
+          <div
+            class='flex border border-gray-300 rounded-md overflow-hidden'
+            style='height: 400px;'
+          >
+            <!-- 行号区域 -->
+            <div
+              id='line-numbers'
+              class='bg-gray-100 text-gray-500 text-right pr-2 py-2 font-mono text-sm select-none'
+            >
+            </div>
+            <!-- 文本框 -->
+            <textarea
+              id='text-input'
+              rows='20'
+              placeholder=''
+              class='flex-1 px-4 py-2 border-0 focus:outline-none focus:ring-0 font-mono resize-none overflow-y-auto'
+              style='height: 100%;'></textarea>
+          </div>
         </div>
       </div>
 
@@ -105,6 +117,7 @@ const title = 'Tools'
     const searchInput = document.getElementById('search-input') as HTMLInputElement
     const searchNextBtn = document.getElementById('search-next-btn')
     const textInput = document.getElementById('text-input') as HTMLTextAreaElement
+    const lineNumbers = document.getElementById('line-numbers')
     const matchInfo = document.getElementById('match-info') as HTMLSpanElement
     const formatRadios = document.querySelectorAll(
       "input[name='format-type']"
@@ -188,6 +201,8 @@ const title = 'Tools'
         matchInfo.textContent = '0 / 0'
         // 文本框滚动到顶部
         textInput.scrollTop = 0
+        // 更新行号
+        updateLineNumbers()
       } catch (error) {
         alert('格式化失败：' + (error as Error).message)
       }
@@ -454,9 +469,34 @@ const title = 'Tools'
       }
     }
 
+    // 更新行号
+    function updateLineNumbers() {
+      if (!lineNumbers || !textInput) return
+
+      const text = textInput.value
+      // 计算行数，空字符串算一行
+      const lineCount = text ? text.split('\n').length : 1
+      let lineNumbersText = ''
+      for (let i = 1; i <= lineCount; i++) {
+        lineNumbersText += i + '\n'
+      }
+      lineNumbers.textContent = lineNumbersText
+    }
+
+    // 同步滚动
+    function syncScroll() {
+      if (!lineNumbers || !textInput) return
+      lineNumbers.scrollTop = textInput.scrollTop
+    }
+
+    // 文本框事件监听
+    textInput.addEventListener('input', updateLineNumbers)
+    textInput.addEventListener('scroll', syncScroll)
+
     // 初始化
     searchInput.value = ''
     matchInfo.textContent = '0 / 0'
+    updateLineNumbers()
   </script>
 
   <style>
@@ -482,12 +522,39 @@ const title = 'Tools'
     #text-input {
       font-family: inherit;
       font-size: 1rem;
+      background-color: var(--background);
+      color: var(--foreground);
+    }
+
+    /* 行号区域样式 */
+    #line-numbers {
+      width: 40px;
+      min-width: 40px;
+      background-color: var(--background);
+      color: var(--foreground);
+      border-right: 1px solid var(--border);
+      user-select: none;
+      overflow: hidden;
+      line-height: 1.5;
+      padding-top: 8px;
+      white-space: pre;
+    }
+
+    /* 确保文本框和行号区域高度一致 */
+    #text-input {
+      line-height: 1.5;
+    }
+
+    #search-input:focus,
+    #text-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
 
     /* 自定义滚动条样式 */
     #text-input {
       scrollbar-width: 16px;
-      scrollbar-color: #888 #f1f1f1;
+      scrollbar-color: #cbd5e1 #f1f5f9;
     }
 
     #text-input::-webkit-scrollbar {
@@ -495,17 +562,17 @@ const title = 'Tools'
     }
 
     #text-input::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: #f1f5f9;
       border-radius: 8px;
     }
 
     #text-input::-webkit-scrollbar-thumb {
-      background: #888;
+      background: #cbd5e1;
       border-radius: 8px;
     }
 
     #text-input::-webkit-scrollbar-thumb:hover {
-      background: #555;
+      background: #94a3b8;
     }
   </style>
 </PageLayout>
