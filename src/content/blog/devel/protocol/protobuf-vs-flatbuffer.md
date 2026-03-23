@@ -6,7 +6,7 @@ tags:
   - protocol
 ---
 
-#  前言
+# 前言
 
 &emsp;&emsp;Protocol Buffers，也被称为Protobuf，是由谷歌在2008年开源的与语言无关、与平台无关的可扩展的结构化数据序列化组件，可用于通信协议、数据存储等场景。自开源以来，因为其简单易用、压缩率高、运行效率高、开发效率高等特点，经历了时间的验证，在业界有广泛的应用。
 
@@ -22,12 +22,12 @@ tags:
 
 &emsp;&emsp;根据官网的描述，我们对Protobuf与FlatBuffers有如下大致的对比：
 
-|              | Protobuf                                                     | Flatbuffers                                                  |
-| ------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| 支持语言     | C/C++, C#, Go, Java, Python, Ruby, <br>Objective-C, Dart         | C/C++, C#, Go, Java, JavaScript, TypeScript, Lua, <br>PHP, Python,  Rust, Lobster |
-| 版本         | 2.x/3.x，不相互兼容                                          | 1.x                                                          |
-| 协议文件     | .proto，需指定协议文件版本                                   | .fbs                                                         |
-| 代码生成工具 | 有（生成代码量较多）                                         | 有（生成代码量较少）                                         |
+|              | Protobuf                                                                                                                       | Flatbuffers                                                                                       |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| 支持语言     | C/C++, C#, Go, Java, Python, Ruby, <br>Objective-C, Dart                                                                       | C/C++, C#, Go, Java, JavaScript, TypeScript, Lua, <br>PHP, Python, Rust, Lobster                  |
+| 版本         | 2.x/3.x，不相互兼容                                                                                                            | 1.x                                                                                               |
+| 协议文件     | .proto，需指定协议文件版本                                                                                                     | .fbs                                                                                              |
+| 代码生成工具 | 有（生成代码量较多）                                                                                                           | 有（生成代码量较少）                                                                              |
 | 协议字段类型 | bool, bytes, int32, int64, uint32, uint64, <br>sint32, sint64, fixed32, fixed64, sfixed32, <br>sfixed64, float, double, string | bool, int8, uint8, int16, uint16, int32, uint32, int64, <br>uint64, float, double, string, vector |
 
 &emsp;&emsp;为了对Protobuf与FlatBuffers的性能有更具体的对比，我做了如下的性能测试，具体代码见[Git仓库](https://git.ppgame.com/lijixue/protocol-benchmark-java)。
@@ -38,9 +38,9 @@ tags:
 
 ## 测试数据
 
-*   少量数据：只有1个int32，这种情况主要模拟简单的客户端请求/服务器返回，实际业务中有部分通信消息都是这种简单的少量数据，原数据大小为4字节。
-*   中量数据：有常用的数据类型：int32、int64、float和string，每个类型均为10个，每个string大小为10字节，则原数据大小为260字节（10 * (4+8+4+10)）。因为这些都是用的最多的业务数据类型，实际业务中有大量通信消息都是这种数据量一般的中量数据。
-*   大量数据：同样也有常用的数据类型：int32、int64、float和string，每个类型均为10000个。因为业务中可能会出现少量大消息数据的情况，可以利用该情景来测试一下比较极限的情况，原数据大小为253KB（10000 * (4+8+4+10) / 1024）。
+- 少量数据：只有1个int32，这种情况主要模拟简单的客户端请求/服务器返回，实际业务中有部分通信消息都是这种简单的少量数据，原数据大小为4字节。
+- 中量数据：有常用的数据类型：int32、int64、float和string，每个类型均为10个，每个string大小为10字节，则原数据大小为260字节（10 \* (4+8+4+10)）。因为这些都是用的最多的业务数据类型，实际业务中有大量通信消息都是这种数据量一般的中量数据。
+- 大量数据：同样也有常用的数据类型：int32、int64、float和string，每个类型均为10000个。因为业务中可能会出现少量大消息数据的情况，可以利用该情景来测试一下比较极限的情况，原数据大小为253KB（10000 \* (4+8+4+10) / 1024）。
 
 ## 测试环境
 
@@ -65,8 +65,8 @@ FlatBuffers：1.11.0
     syntax = "proto3";
     // 指定生成消息类的Java包
     option java_package = "com.digisky.protocol.msg.pb";
-    
-    
+
+
     // 消息
     message Msg {
         // int32数据
@@ -74,7 +74,7 @@ FlatBuffers：1.11.0
         // 数据消息
         repeated DataMsg datas = 2;
     }
-    
+
     message DataMsg {
         // int32数据
         int32 intData = 1;
@@ -145,7 +145,7 @@ FlatBuffers：1.11.0
     ```
     // 指定生成消息类的Java包
     namespace com.digisky.protocol.msg.fb;
-    
+
     // 消息
     table Msg {
         // int32数据
@@ -153,7 +153,7 @@ FlatBuffers：1.11.0
         // 数据消息
         datas:[DataMsg];
     }
-    
+
     table DataMsg {
         // int32数据
         intData:int;
@@ -172,7 +172,7 @@ FlatBuffers：1.11.0
 
     编译命令：`flatc --java -o ../../src/main/java/ Fb.fbs`
 
-    &emsp;&emsp;需要注意的是flatc不支持通配符来指定协议文件，不能像Protobuf一样使用*.fbs。
+    &emsp;&emsp;需要注意的是flatc不支持通配符来指定协议文件，不能像Protobuf一样使用\*.fbs。
 
 3.  同样查看生成的Java代码，可以看到在com.digisky.protocol.msg.fb包下生成了两个类：Msg与DataMsg。
 
@@ -220,13 +220,11 @@ FlatBuffers：1.11.0
 
     &emsp;&emsp;反序列化就相对简单了，先利用NIO将byte[]包装成ByteBuffer，然后利用Msg的getRootAsMsg即可获得Msg对象，就可以进行取值操作了。
 
-
-
 ## 性能测试
 
 &emsp;&emsp;通过上述使用步骤可以看出，Protobuf与FlatBuffers的使用步骤基本一致，最主要的区别就是Protobuf生成的代码量庞大，消息封装简单；而FlatBuffers则相反，生成的代码量少，消息封装稍显复杂。那么他们的性能到底如何呢，在少量、中量、大量数据的情形下表现如何呢，我从数据大小、序列化时间、反序列化时间、内存使用等维度进行了测试对比。
 
-*   数据大小
+- 数据大小
 
 |             | 少量数据（4字节） | 中量数据（260字节） | 大量数据（253千字节） |
 | ----------- | ----------------- | ------------------- | --------------------- |
@@ -235,36 +233,31 @@ FlatBuffers：1.11.0
 
 &emsp;&emsp;可以看到，在数据量很少的情况下，Protobuf要比FlatBuffers小很多倍，当数据量逐渐增大后，Protobuf最终会比FlatBuffers小一半左右。所以结论是，Protobuf比FlatBuffers在数据大小上更优（约领先一倍），但因为不同的数据量，不同的字段类型都会影响到该性能指标，这里只得出一个大致的结论，我将在后面源码解析部分做更详细的分析。
 
-*   序列化时间
+- 序列化时间
 
 |             | 少量数据（4字节） | 中量数据（260字节） | 大量数据（253千字节） |
 | ----------- | ----------------- | ------------------- | --------------------- |
 | Protobuf    | 1466纳秒          | 10757纳秒           | 2,000,497纳秒         |
 | FlatBuffers | 1922纳秒          | 9754纳秒            | 2,760,061纳秒         |
 
-
 &emsp;&emsp;可以看到，在序列化时间上，Protobuf与Flatbuffers整体上不相上下。因此可以得出结论：Protobuf与FlatBuffers在序列化耗时上性能基本一致。
 
-*   反序列化时间
+- 反序列化时间
 
 |             | 少量数据（4字节） | 中量数据（260字节） | 大量数据（253千字节） |
 | ----------- | ----------------- | ------------------- | --------------------- |
 | Protobuf    | 2040纳秒          | 5393纳秒            | 1,101,464纳秒         |
 | FlatBuffers | 847纳秒           | 312纳秒             | 286纳秒               |
 
-
 &emsp;&emsp;可以看到，在数据量很少的情况下，FlatBuffers的反序列化时间大约比Protobuf少一半，而在中等数据的情况下优势就已经比较明显，在大量数据的情况下呢？
-
 
 &emsp;&emsp;Protobuf直接被秒杀！这也验证了本文刚开始介绍的Flatbuffers的特性：不需要转换/解包的操作就能够获得原数据，因此反序列化时间几乎为0。所以结论是：FlatBuffers可以在反序列化性能上打败任何框架/组件，因为它已经将该性能做到了极致。
 
-*   内存使用
+- 内存使用
 
 &emsp;&emsp;因为使用Java语言来测试的缘故，无法准确统计到底使用了多少内存，但可以通过垃圾回收来侧面反映整个测试过程的内存使用情况，我设定了最大堆内存（Xmx）为16MB，首先来看Protobuf的gc情况。
 
-
 &emsp;&emsp;可以看到，对于测试数据，Protobuf序列化与反序列化总共消耗了1分06秒，CPU平均占用42%，垃圾回收占用12.2%，GC情况如图。
-
 
 &emsp;&emsp;而Flatbuffers只运行了32秒，因为反序列化特性的缘故节省了很多时间，比较符合预期。而CPU利用率只有27%，垃圾回收也只占2.9%，GC次数更是明显比Protobuf少了至少一半，因此Flatbuffers运行过程比较轻量，占用资源较少。
 
@@ -425,7 +418,6 @@ public final void writeUInt32NoTag(int value) throws IOException {
 
 &emsp;&emsp;那么具体是怎样赋值的呢，这里就需要先介绍Protobuf的[Base 128 Varints](https://developers.google.com/protocol-buffers/docs/encoding)的概念。简单来讲，就是将每个字节的8个bit按用途进行划分，最高位的那个bit称为“most significant bit”（MSB）用来存储标志，表示本字节外是否还有额外的字节，其余低7位的bit用来存储数据。因此，每个字节只能存储7个bit的数据（非负值的取值范围为0-127），这也与前面计算占用空间时所说的数据按每7bit分为一段相符合。
 
-
 &emsp;&emsp;那么上面的代码含义就是，首先判断数据是否不超过127（最高位是否为0），若为0，则表示本数据只有一个字节，直接强转为byte后写入即可；若不为0，则表示除本字节外，还需要有额外的字节来写数据，于是就先写入本数据的前7bit，并把MSB置为1，作为1个字节数据写入，然后再按照同样的方式（每7bit为一段）来处理后面的数据。
 
 &emsp;&emsp;看到这里，Protobuf的数据压缩原理基本就清晰了，对于int32类型的数据，会根据数据值将4个字节的空间最多压缩到1个字节，再加上协议本身（tag）所占的空间，最高能压缩到2字节。因此对于int32类型的数据，最高能达到的压缩率是50%（字段为默认值的除外，其压缩率为100%）。
@@ -565,7 +557,7 @@ public void prep(int size, int additional_bytes) {
     }
     pad(align_size);
 }
-    
+
 /**
  * Add an `int` to the buffer, backwards from the current location. Doesn't align nor
  * check for space.
@@ -626,7 +618,7 @@ public void __init(int _i, ByteBuffer _bb) {
 }
 ```
 
-&emsp;&emsp;通过上述几个方法深追可以看到，首先将ByteBuffer设置成了小端模式，然后调用__assign方法将ByteBuffer关联到Msg对象，并将其初始化。整个过程中都只是简单的赋值操作，没有进行内存拷贝、数据解码等耗时操作，那么消息字段又怎样解析呢，我们以intData为例：
+&emsp;&emsp;通过上述几个方法深追可以看到，首先将ByteBuffer设置成了小端模式，然后调用\_\_assign方法将ByteBuffer关联到Msg对象，并将其初始化。整个过程中都只是简单的赋值操作，没有进行内存拷贝、数据解码等耗时操作，那么消息字段又怎样解析呢，我们以intData为例：
 
 ```java
 public int intData() {
@@ -655,12 +647,11 @@ protected int __offset(int vtable_offset) {
 2.  Protobuf采用"Base 128 Varints"算法对整型数据进行压缩，压缩比例最高能达到50%（字段为默认值的除外，其压缩率为100%）；序列化与反序列化都比较重度，生成的代码量较大，CPU占用较高，内存占用较多。
 3.  Protobuf 3.x中移除了required和optional字段描述，相当于除repeated以外的所有字段都是optional，提高了Protobuf的消息兼容性。
 4.  Protobuf使用技巧：
-    *   为了使数据压缩率更高，每个消息的字段数量最好不要超过15个。
-    *   尽量不要使用int32与int64，如果是正数使用uint，如果是负数则使用sint。
-    *   如果业务中能够控制int32或int64型数据的取值范围，尽量控制在0-127。
-    *   通过以上技巧都能够提高Protobuf的数据压缩能力。
+    - 为了使数据压缩率更高，每个消息的字段数量最好不要超过15个。
+    - 尽量不要使用int32与int64，如果是正数使用uint，如果是负数则使用sint。
+    - 如果业务中能够控制int32或int64型数据的取值范围，尽量控制在0-127。
+    - 通过以上技巧都能够提高Protobuf的数据压缩能力。
 5.  Flatbuffers使用技巧：
-    *   uint类型只是为了扩大int的取值范围（兼容c/c++与c#等有unsigned int类型的语言），而如果是java等没有unsigned int等类型的语言，会在赋值与取值时扩展为long来处理，所以若非有实际需要，尽量不要使用uint。
-    *   如果业务中能够控制bool、int8、int16、int32、int64的取值是0与非0的概率，尽量让取值为0的情况多一些，可以使Flatbuffers具备一定的压缩能力。
+    - uint类型只是为了扩大int的取值范围（兼容c/c++与c#等有unsigned int类型的语言），而如果是java等没有unsigned int等类型的语言，会在赋值与取值时扩展为long来处理，所以若非有实际需要，尽量不要使用uint。
+    - 如果业务中能够控制bool、int8、int16、int32、int64的取值是0与非0的概率，尽量让取值为0的情况多一些，可以使Flatbuffers具备一定的压缩能力。
 6.  若项目需求对数据处理延时有严苛的要求（例如FPS、Moba、动作RPG等），可以考虑使用Flatbuffers，并配合UDP/KCP等传输层协议，能够比传统的TCP+Protobuf方案有更好的降低延时的效果。
-

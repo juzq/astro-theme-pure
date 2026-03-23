@@ -16,10 +16,10 @@ const title = 'Tools'
           字符串格式化
         </button>
         <button
-          data-tab='encoder'
+          data-tab='timestamp'
           class='tab-button flex-1 py-3 px-6 text-sm font-medium transition-colors'
         >
-          URL 编码
+          时间戳转换
         </button>
       </nav>
 
@@ -104,9 +104,68 @@ const title = 'Tools'
         </div>
       </div>
 
-      <!-- URL 编码内容（占位） -->
-      <div id='tab-encoder' class='tab-content p-6 hidden'>
-        <p class='text-muted-foreground'>URL 编码功能正在开发中...</p>
+      <!-- 时间戳转换内容 -->
+      <div id='tab-timestamp' class='tab-content p-6 hidden'>
+        <!-- 当前时间戳 -->
+        <div class='mb-6'>
+          <div class='flex flex-col gap-2'>
+            <h3 class='text-lg font-medium'>当前时间戳</h3>
+            <div class='flex items-center justify-between'>
+              <p class='text-sm'>秒级时间戳：<span id='current-timestamp-seconds'></span></p>
+              <button
+                id='copy-seconds-btn'
+                class='px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
+              >
+                复制
+              </button>
+            </div>
+            <div class='flex items-center justify-between'>
+              <p class='text-sm'>
+                毫秒级时间戳：<span id='current-timestamp-milliseconds'></span>
+              </p>
+              <button
+                id='copy-milliseconds-btn'
+                class='px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
+              >
+                复制
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 时间戳转时间 -->
+        <div class='mb-6'>
+          <div class='flex items-center gap-4 mb-6'>
+            <h3 class='text-lg font-medium'>时间戳转时间</h3>
+            <input
+              type='text'
+              id='timestamp-input'
+              placeholder='输入秒级或毫秒级时间戳'
+              class='flex-1 px-4 py-2 border border-border rounded-md bg-background text-foreground'
+            />
+          </div>
+          <div class='flex flex-col gap-2'>
+            <p class='text-sm'>GMT 时间：<span id='gmt-time'></span></p>
+            <p class='text-sm'>东八区时间：<span id='cst-time'></span></p>
+            <p class='text-sm'>相对时间：<span id='relative-time'></span></p>
+          </div>
+        </div>
+
+        <!-- 时间转时间戳 -->
+        <div class='mb-6'>
+          <div class='flex items-center gap-4 mb-6'>
+            <h3 class='text-lg font-medium'>时间转时间戳</h3>
+            <input
+              type='datetime-local'
+              id='datetime-input'
+              class='flex-1 px-4 py-2 border border-border rounded-md bg-background text-foreground'
+            />
+          </div>
+          <div class='flex flex-col gap-2'>
+            <p class='text-sm'>秒级时间戳：<span id='converted-timestamp-seconds'></span></p>
+            <p class='text-sm'>毫秒级时间戳：<span id='converted-timestamp-milliseconds'></span></p>
+          </div>
+        </div>
       </div>
     </div>
   </main>
@@ -128,7 +187,7 @@ const title = 'Tools'
     // 页签切换
     tabButtons.forEach((button) => {
       button.addEventListener('click', () => {
-        const tabName = button.dataset.tab
+        const tabName = (button as HTMLElement).dataset.tab
         tabButtons.forEach((btn) => {
           btn.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600')
         })
@@ -138,12 +197,14 @@ const title = 'Tools'
         // 切换页签时清除搜索状态
         searchInput.value = ''
         matchInfo.textContent = '0 / 0'
+        allMatches = []
       })
     })
 
     // 初始化选中第一个页签
     tabButtons[0].classList.add('border-b-2', 'border-blue-600', 'text-blue-600')
     document.getElementById('tab-format')?.classList.remove('hidden')
+    document.getElementById('tab-timestamp')?.classList.add('hidden')
 
     // 清空按钮
     clearBtn.addEventListener('click', () => {
@@ -493,10 +554,272 @@ const title = 'Tools'
     textInput.addEventListener('input', updateLineNumbers)
     textInput.addEventListener('scroll', syncScroll)
 
+    // 时间戳转换功能
+    const currentTimestampSeconds = document.getElementById('current-timestamp-seconds')
+    const currentTimestampMilliseconds = document.getElementById('current-timestamp-milliseconds')
+    const copySecondsBtn = document.getElementById('copy-seconds-btn')
+    const copyMillisecondsBtn = document.getElementById('copy-milliseconds-btn')
+    const timestampInput = document.getElementById('timestamp-input') as HTMLInputElement
+    const gmtTime = document.getElementById('gmt-time')
+    const cstTime = document.getElementById('cst-time')
+    const relativeTime = document.getElementById('relative-time')
+    const datetimeInput = document.getElementById('datetime-input') as HTMLInputElement
+    const convertedTimestampSeconds = document.getElementById('converted-timestamp-seconds')
+    const convertedTimestampMilliseconds = document.getElementById(
+      'converted-timestamp-milliseconds'
+    )
+
+    // 格式化时间为指定格式
+    function formatDateTime(date: Date): string {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+      const milliseconds = String(date.getMilliseconds()).padStart(3, '0')
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`
+    }
+
+    // 动态更新当前时间戳
+    function updateCurrentTimestamp() {
+      const now = Date.now()
+      const seconds = Math.floor(now / 1000)
+      if (currentTimestampSeconds) currentTimestampSeconds.innerHTML = seconds.toString()
+      if (currentTimestampMilliseconds) currentTimestampMilliseconds.innerHTML = now.toString()
+    }
+
+    // 初始化当前时间
+    function initCurrentDate() {
+      const now = new Date()
+      // 格式化为datetime-local输入框的格式：YYYY-MM-DDTHH:mm
+      const year = now.getFullYear()
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const day = String(now.getDate()).padStart(2, '0')
+      const hours = String(now.getHours()).padStart(2, '0')
+      const minutes = String(now.getMinutes()).padStart(2, '0')
+      if (datetimeInput) {
+        datetimeInput.value = `${year}-${month}-${day}T${hours}:${minutes}`
+      }
+    }
+
+    // 获取当前浏览器时区
+    function getBrowserTimezone() {
+      return Intl.DateTimeFormat().resolvedOptions().timeZone
+    }
+
+    // 获取时区偏移（分钟）
+    function getTimezoneOffset() {
+      return new Date().getTimezoneOffset()
+    }
+
+    // 时间戳转时间
+    function timestampToTime(timestamp: string) {
+      if (!timestamp) {
+        if (gmtTime) gmtTime.innerHTML = ''
+        if (cstTime) cstTime.innerHTML = ''
+        if (relativeTime) relativeTime.innerHTML = ''
+        return
+      }
+
+      let ts = parseInt(timestamp)
+      // 自动识别秒级或毫秒级时间戳
+      if (ts.toString().length === 10) {
+        ts *= 1000
+      }
+
+      const date = new Date(ts)
+
+      // GMT时间（UTC时间）
+      if (gmtTime) {
+        const gmtDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000)
+        gmtTime.innerHTML = formatDateTime(gmtDate)
+      }
+
+      // 东八区时间（UTC+8）
+      if (cstTime) {
+        const cstDate = new Date(date.getTime() + (8 * 60 + date.getTimezoneOffset()) * 60000)
+        cstTime.innerHTML = formatDateTime(cstDate)
+      }
+
+      // 相对时间
+      const now = Date.now()
+      const diff = now - ts
+      const absDiff = Math.abs(diff)
+
+      let relativeStr = ''
+      const oneMinute = 60000
+      const oneHour = 3600000
+      const oneDay = 86400000
+      const oneWeek = 604800000
+      const fourWeeks = 2419200000 // 4周 = 28天
+      const oneMonth = 2592000000 // 平均每月30天
+      const oneYear = 31536000000
+
+      if (absDiff < oneMinute) {
+        relativeStr = `${Math.floor(absDiff / 1000)}秒`
+      } else if (absDiff < oneHour) {
+        relativeStr = `${Math.floor(absDiff / oneMinute)}分钟`
+      } else if (absDiff < oneDay) {
+        relativeStr = `${Math.floor(absDiff / oneHour)}小时`
+      } else if (absDiff < oneWeek) {
+        relativeStr = `${Math.floor(absDiff / oneDay)}天`
+      } else if (absDiff < fourWeeks) {
+        relativeStr = `${Math.floor(absDiff / oneWeek)}周`
+      } else if (absDiff < oneYear) {
+        relativeStr = `${Math.floor(absDiff / oneMonth)}月`
+      } else {
+        relativeStr = `${Math.floor(absDiff / oneYear)}年`
+      }
+
+      relativeStr = diff > 0 ? `${relativeStr}前` : `${relativeStr}后`
+      if (relativeTime) relativeTime.innerHTML = relativeStr
+    }
+
+    // 时间转时间戳
+    function timeToTimestamp() {
+      if (!datetimeInput) return
+
+      const datetimeValue = datetimeInput.value
+      if (!datetimeValue) {
+        if (convertedTimestampSeconds) convertedTimestampSeconds.innerHTML = ''
+        if (convertedTimestampMilliseconds) convertedTimestampMilliseconds.innerHTML = ''
+        return
+      }
+
+      const date = new Date(datetimeValue)
+      const timestampSeconds = Math.floor(date.getTime() / 1000)
+      const timestampMilliseconds = date.getTime()
+
+      if (convertedTimestampSeconds)
+        convertedTimestampSeconds.innerHTML = timestampSeconds.toString()
+      if (convertedTimestampMilliseconds)
+        convertedTimestampMilliseconds.innerHTML = timestampMilliseconds.toString()
+    }
+
+    // 显示提示信息
+    function showToast(message: string) {
+      // 创建提示元素
+      const toast = document.createElement('div')
+      toast.className =
+        'fixed top-4 right-4 px-4 py-2 bg-blue-600 text-white rounded-md shadow-lg z-50'
+      toast.textContent = message
+      document.body.appendChild(toast)
+
+      // 显示动画
+      toast.style.opacity = '0'
+      toast.style.transform = 'translateY(-20px)'
+      toast.style.transition = 'opacity 0.3s, transform 0.3s'
+
+      setTimeout(() => {
+        toast.style.opacity = '1'
+        toast.style.transform = 'translateY(0)'
+      }, 10)
+
+      // 3秒后消失
+      setTimeout(() => {
+        toast.style.opacity = '0'
+        toast.style.transform = 'translateY(-20px)'
+        setTimeout(() => {
+          document.body.removeChild(toast)
+        }, 300)
+      }, 3000)
+    }
+
+    // 复制功能
+    function copyToClipboard(text: string) {
+      console.log('复制文本:', text)
+      if (!text) {
+        showToast('没有可复制的内容')
+        return
+      }
+
+      // 尝试使用navigator.clipboard API
+      if (navigator.clipboard) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            console.log('复制成功')
+            showToast('复制成功！')
+          })
+          .catch((err) => {
+            console.error('复制失败:', err)
+            // 尝试使用传统的复制方法
+            fallbackCopyTextToClipboard(text)
+          })
+      } else {
+        // 浏览器不支持navigator.clipboard API
+        fallbackCopyTextToClipboard(text)
+      }
+    }
+
+    // 传统的复制方法作为 fallback
+    function fallbackCopyTextToClipboard(text: string) {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+
+      // 避免滚动到元素
+      textArea.style.top = '0'
+      textArea.style.left = '0'
+      textArea.style.position = 'fixed'
+
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+
+      try {
+        const successful = document.execCommand('copy')
+        if (successful) {
+          showToast('复制成功！')
+        } else {
+          showToast('复制失败，请手动复制')
+        }
+      } catch (err) {
+        console.error('复制失败:', err)
+        showToast('复制失败，请手动复制')
+      } finally {
+        document.body.removeChild(textArea)
+      }
+    }
+
+    // 事件监听
+    if (timestampInput) {
+      timestampInput.addEventListener('input', () => {
+        timestampToTime(timestampInput.value)
+      })
+    }
+
+    if (datetimeInput) {
+      datetimeInput.addEventListener('input', timeToTimestamp)
+    }
+
+    // 复制按钮事件监听
+    if (copySecondsBtn) {
+      copySecondsBtn.addEventListener('click', () => {
+        if (currentTimestampSeconds) {
+          copyToClipboard(currentTimestampSeconds.textContent || '')
+        }
+      })
+    }
+
+    if (copyMillisecondsBtn) {
+      copyMillisecondsBtn.addEventListener('click', () => {
+        if (currentTimestampMilliseconds) {
+          copyToClipboard(currentTimestampMilliseconds.textContent || '')
+        }
+      })
+    }
+
     // 初始化
     searchInput.value = ''
     matchInfo.textContent = '0 / 0'
     updateLineNumbers()
+    updateCurrentTimestamp()
+    initCurrentDate()
+    timeToTimestamp() // 初始化时间转时间戳
+
+    // 每秒钟更新一次当前时间戳
+    setInterval(updateCurrentTimestamp, 1000)
   </script>
 
   <style>

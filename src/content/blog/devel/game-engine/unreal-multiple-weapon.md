@@ -8,13 +8,11 @@ tags:
 
 ## 回顾
 
-&emsp;&emsp;通过UE4蓝图的开发，我实现了类似CS的单人版射击游戏，效果如下视频：  
+&emsp;&emsp;通过UE4蓝图的开发，我实现了类似CS的单人版射击游戏，效果如下视频：
 
 <iframe src="//player.bilibili.com/player.html?aid=66018584&cid=114524544&page=1&high_quality=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="800" height="550"> </iframe>
 
 &emsp;&emsp;不得不说UE4蓝图功能的强大，无需写一句代码，就能实现一个基本的游戏玩法。并且使用门槛极低，只要熟悉蓝图的API，通过“拖拖，连连”就能完成游戏玩法的开发，对游戏策划（设计师）及其友好，与C++相比，生产效率极高。
-
-
 
 ## 多武器系统
 
@@ -150,7 +148,7 @@ void AWeapon::ReloadFinish()
 
 # 遇到的问题
 
-*   蓝图中绑定的Mesh无法传递到C++
+- 蓝图中绑定的Mesh无法传递到C++
 
 &emsp;&emsp;我按照之前的方法，在C++中定义好骨骼Mesh指针：
 
@@ -188,7 +186,7 @@ USkeletalMeshComponent* MeshComponent;
 
 &emsp;&emsp;还有其他办法吗？通过查询UE4 C++的API，我找到了`AActor::GetComponentByClass`这个函数，官方文档的描述是：
 
->   Searches components array and returns first encountered component of the specified class
+> Searches components array and returns first encountered component of the specified class
 
 &emsp;&emsp;即查找并获取本Actor的指定类型的组件的第一个。这不正是我需要的吗？如果我指定查找类型为USkeletalMeshComponent，而每个武器只有一个USkeletalMeshComponent，那这样不就从蓝图中获取到了绑定的Mesh吗？实现代码如下：
 
@@ -205,12 +203,11 @@ void AWeapon::BeginPlay()
 
 <iframe src="//player.bilibili.com/player.html?aid=66014316&cid=114517140&page=1&high_quality=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" width="800" height="550"> </iframe>
 
-
 ## 蓝图与C++选择的思考
 
 &emsp;&emsp;既然UE4同时支持蓝图与C++，那么我们在开发时应该如何选择呢？官方文档有如下的解释：
 
->   程序员利用C++即可添加基础Gameplay系统，然后设计师可基于这些系统进行构建或利用这些系统为某个特定关卡或游戏本身创建自定义Gameplay。
+> 程序员利用C++即可添加基础Gameplay系统，然后设计师可基于这些系统进行构建或利用这些系统为某个特定关卡或游戏本身创建自定义Gameplay。
 
 &emsp;&emsp;也就是说，程序员用C++开发一些基础的系统，例如本文当中的武器系统（Weapon），设计师（策划）即可利用该武器系统在蓝图上进行武器的扩充，设计出不同的武器；设计师（策划）也可以利用C++开发的基础系统，将这些系统在蓝图上进行组装，以构建更丰富的玩法系统。除此之外，
 

@@ -7,6 +7,7 @@
 ## 修改内容
 
 ### 1. 导航栏配置
+
 **文件**: `src/site-config.ts`
 
 在 header.menu 中添加了 Tools 链接，位于 Blog 和 About 之间：
@@ -22,11 +23,13 @@ header: {
 ```
 
 ### 2. 工具页面
+
 **文件**: `src/pages/tools/index.astro`
 
 创建了完整的工具页面，包含以下功能：
 
 #### 功能特点
+
 - ✅ 多页签切换系统
 - ✅ 字符串格式化工具（JSON、XML、Protobuf）
 - ✅ 实时搜索功能（带防抖）
@@ -36,6 +39,7 @@ header: {
 - ✅ 美观的 UI 界面
 
 #### 格式化功能
+
 1. **JSON 格式化**
    - 自动检测并解析 JSON
    - 添加缩进和换行
@@ -54,21 +58,25 @@ header: {
    - 保留注释
 
 #### 用户体验
+
 - 深色/浅色主题适配
 - 平滑的页签切换动画
 - 清晰的错误提示
 - 现代化的 UI 设计
 
 ### 3. 文档文件
+
 **文件**: `src/pages/tools/README.md`
 
 创建了详细的使用说明文档，包括：
+
 - 当前功能介绍
 - 使用方法
 - 测试用例
 - 未来计划
 
 ### 4. 测试数据
+
 **文件**: `src/pages/tools/test-example.txt`
 
 提供了 JSON 测试数据，方便用户测试格式化功能。
@@ -76,18 +84,21 @@ header: {
 ## 技术实现
 
 ### 前端技术
+
 - **HTML5**: 语义化标签
 - **TypeScript**: 类型安全
 - **CSS**: UnoCSS 工具类
 - **JavaScript**: 原生 JavaScript（无框架依赖）
 
 ### 关键实现
+
 1. **页签切换**: 使用 data-tab 属性和 CSS 类控制显示/隐藏
 2. **实时搜索**: 使用 debounce 防抖优化性能
 3. **格式化算法**: 分别针对 JSON、XML、Protobuf 实现不同的格式化逻辑
 4. **错误处理**: Try-catch 包装格式化逻辑，提供友好的错误提示
 
 ### 代码结构
+
 ```javascript
 // 页签切换
 tabButtons.forEach((button) => {
@@ -100,25 +111,36 @@ tabButtons.forEach((button) => {
 formatBtn.addEventListener('click', () => {
   const formatType = getSelectedFormat()
   switch (formatType) {
-    case 'json': formatJSON(); break;
-    case 'xml': formatXML(); break;
-    case 'protobuf': formatProtobuf(); break;
+    case 'json':
+      formatJSON()
+      break
+    case 'xml':
+      formatXML()
+      break
+    case 'protobuf':
+      formatProtobuf()
+      break
   }
 })
 
 // 实时搜索（防抖）
-searchInput.addEventListener('input', debounce(() => {
-  performSearch()
-}, 300))
+searchInput.addEventListener(
+  'input',
+  debounce(() => {
+    performSearch()
+  }, 300)
+)
 ```
 
 ## 访问方式
 
 ### 开发环境
+
 1. 启动开发服务器：`pnpm dev`
 2. 访问：http://localhost:4321/tools
 
 ### 生产环境
+
 1. 构建项目：`pnpm build`
 2. 预览构建：`pnpm preview`
 3. 访问：http://localhost:4321/tools

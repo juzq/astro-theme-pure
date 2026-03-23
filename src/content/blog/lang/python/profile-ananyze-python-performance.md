@@ -7,14 +7,18 @@ tags:
 ---
 
 ## 用法
+
 ### API方式
+
 API方式允许我们以代码的方式来运行性能测试，API接口为：
+
 ```
 import profile
 profile.run(<function_name>, <file_name>, <sort>)
 ```
 
 首先需要导入profile模块，然后调用run函数。若未指定文件名，则会将分析结果打印出来。例：
+
 ```py
 import profile
 
@@ -27,7 +31,7 @@ def cal_factorial(x1, x2):
 
 def functionA():
     cal_factorial(1, 10000)
-    
+
 def functionB():
     cal_factorial(1, 100000)
 
@@ -43,8 +47,8 @@ profile.run("test_code()")
 # profile.run("test_code()", "profile")
 ```
 
-
 ### 命令行
+
 相比于API方式，使用命令行则会更加方便的分析我们已经写好的代码。语法：
 
 不保存文件：`python -m cProfile <code_file_name>.py`
@@ -61,17 +65,18 @@ profile.run("test_code()")
 
 其中，sort_stats支持以下参数排序：
 
-* calls/ncalls：调用次数
-* cumtime/cumulative：累计时间
-* filename/module：文件名
-* line：行号
-* name：函数名
-* nfl：函数名，文件名，行号（name/file/line）
-* pcalls：~~原始调用次数~~
-* stdname：~~标准函数名~~
-* time/tottime：时间（不包括子函数时间）
+- calls/ncalls：调用次数
+- cumtime/cumulative：累计时间
+- filename/module：文件名
+- line：行号
+- name：函数名
+- nfl：函数名，文件名，行号（name/file/line）
+- pcalls：~~原始调用次数~~
+- stdname：~~标准函数名~~
+- time/tottime：时间（不包括子函数时间）
 
 参考：在pstats.py中找到如下定义
+
 ```
 The sort_stats() method now processes some additional options (i.e., in
     addition to the old -1, 0, 1, or 2 that are respectively interpreted as
@@ -132,12 +137,13 @@ sort_arg_dict_default = {
 ```
 
 各字段含义：
-* ncalls：调用次数
-* tottime：总时间（不包括子函数时间）
-* cumtime：累计时间（包括子函数时间）
-* percall：每次调用时间=总时间/调用次数
-* filename：文件名
-* lineno：行号
-* function：函数名
+
+- ncalls：调用次数
+- tottime：总时间（不包括子函数时间）
+- cumtime：累计时间（包括子函数时间）
+- percall：每次调用时间=总时间/调用次数
+- filename：文件名
+- lineno：行号
+- function：函数名
 
 从分析结果中可以看出，本次运行test_code一共用了2.361秒，functionA用了0.033秒，functionB用了2.328秒，但他们函数本身都未消耗时间，时间都消耗在调用子函数：cal_factorial上。

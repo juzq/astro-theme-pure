@@ -1,10 +1,9 @@
-import { defineConfig, fontProviders } from 'astro/config'
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
+import AstroPureIntegration from 'astro-pure'
+import { defineConfig, fontProviders } from 'astro/config'
 // import vercel from '@astrojs/vercel'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
-
-import AstroPureIntegration from 'astro-pure'
 
 // Local integrations
 import rehypeAutolinkHeadings from './src/plugins/rehype-auto-link-headings.ts'
@@ -134,7 +133,7 @@ export default defineConfig({
   // ... 其他配置
   vite: {
     server: {
-      hmr: false, // 彻底禁用热更新
-    },
-  },
+      hmr: false // 彻底禁用热更新
+    }
+  }
 })

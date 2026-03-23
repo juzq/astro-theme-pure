@@ -10,6 +10,7 @@ tags:
 从akka 2.6开始，[Typed Actor](https://doc.akka.io/docs/akka/current/typed/actors.html)（类型化的Actor）已经成为默认的Actor，原有的Actor被命名为为[Classic Actor](https://doc.akka.io/docs/akka/current/actors.html)（经典的Actor）。akka推荐新项目直接使用typed actor，因为其提升了类型安全，并且将Java API和Scala API分离，对开发者更加友好。
 
 ## 迁移指南
+
 官网上从经典的Actor迁移到类型化的Actor文档
 
 <https://doc.akka.io/docs/akka/current/typed/from-classic.html>
@@ -19,6 +20,7 @@ tags:
 ### 1. Actor继承与泛型
 
 **Classic Actor**
+
 ```java
 public class ClassicEchoActor extends AbstractActor {
     @Override
@@ -31,6 +33,7 @@ public class ClassicEchoActor extends AbstractActor {
 ```
 
 **Typed Actor**
+
 ```java
 public class TypedEchoBehavior extends AbstractBehavior<String> {
     @Override
@@ -46,6 +49,7 @@ public class TypedEchoBehavior extends AbstractBehavior<String> {
 ```
 
 **对比要点**：
+
 - Typed Actor 使用泛型 `Behavior<String>` 明确指定能处理的消息类型
 - 类型安全：编译期就能发现消息类型错误
 - API 分离：Java 和 Scala 各自有独立的 API
@@ -53,6 +57,7 @@ public class TypedEchoBehavior extends AbstractBehavior<String> {
 ### 2. Actor 创建与生命周期
 
 **Classic Actor**
+
 ```java
 // 从 ActorSystem 创建
 ActorRef<String> actorRef = system.actorOf(Props.create(ClassicEchoActor.class), "echo");
@@ -62,6 +67,7 @@ ActorRef<String> childRef = context.actorOf(Props.create(ClassicEchoActor.class)
 ```
 
 **Typed Actor**
+
 ```java
 // 从 ActorContext 创建
 Behavior<String> behavior = TypedEchoBehavior.create();
@@ -78,6 +84,7 @@ Behavior<Void> rootBehavior = Behaviors.setup(context -> {
 ```
 
 **对比要点**：
+
 - Typed Actor 只能从 ActorContext 创建，不能直接从 ActorSystem 创建
 - 根 Actor 必须通过守护 Actor 创建，保证层级结构
 - 所有 Actor 必须由另一个 Actor 创建，符合 Actor 模型的本质
@@ -85,6 +92,7 @@ Behavior<Void> rootBehavior = Behaviors.setup(context -> {
 ### 3. 消息处理机制
 
 **Classic Actor**
+
 ```java
 @Override
 public Receive createReceive() {
@@ -98,6 +106,7 @@ public Receive createReceive() {
 ```
 
 **Typed Actor**
+
 ```java
 @Override
 public Receive<String> createReceive() {
@@ -111,6 +120,7 @@ public Receive<String> createReceive() {
 ```
 
 **对比要点**：
+
 - Typed Actor 必须返回 Behavior，明确指定下一个状态
 - 支持 `Behaviors.same()` 保持当前状态
 - 支持 `Behaviors.setup()` 初始化逻辑
@@ -119,6 +129,7 @@ public Receive<String> createReceive() {
 ### 4. 发送者与父 Actor
 
 **Classic Actor**
+
 ```java
 // 直接访问 sender
 context.sender().tell("Hello", getSelf());
@@ -128,6 +139,7 @@ context.parent()
 ```
 
 **Typed Actor**
+
 ```java
 // 不再支持 sender 和 parent API
 // 必须通过消息传递
@@ -138,6 +150,7 @@ record WithSender(String message, ActorRef<String> sender) {}
 ```
 
 **对比要点**：
+
 - Typed Actor 移除了 `sender()` 和 `parent()` 方法
 - 减少歧义，明确消息传递语义
 - 需要显式传递 ActorRef
@@ -145,6 +158,7 @@ record WithSender(String message, ActorRef<String> sender) {}
 ### 5. 消息类型
 
 **Classic Actor**
+
 ```java
 // 可以接受任何类型
 .receiveBuilder()
@@ -155,6 +169,7 @@ record WithSender(String message, ActorRef<String> sender) {}
 ```
 
 **Typed Actor**
+
 ```java
 // 强类型，编译期检查
 .onMessage(Integer.class, i -> {...})
@@ -163,6 +178,7 @@ record WithSender(String message, ActorRef<String> sender) {}
 ```
 
 **对比要点**：
+
 - Typed Actor 提供编译期类型安全
 - Classic Actor 在运行时才发现类型错误
 - Typed Actor 明确区分处理和未处理的消息
@@ -170,6 +186,7 @@ record WithSender(String message, ActorRef<String> sender) {}
 ### 6. 状态管理
 
 **Classic Actor 使用 become/unbecome**
+
 ```java
 private enum State { WORKING, PAUSED }
 
@@ -195,6 +212,7 @@ private Receive workHandler() {
 ```
 
 **Typed Actor 使用状态模式**
+
 ```java
 public interface AppState {
 }
@@ -239,6 +257,7 @@ public class EchoBehavior extends AbstractBehavior<String> {
 ```
 
 **对比要点**：
+
 - Typed Actor 鼓励使用显式的状态模式
 - 更易于测试和维护
 - 经典 Actor 使用 become/unbecome 可能导致状态不可追踪
@@ -246,6 +265,7 @@ public class EchoBehavior extends AbstractBehavior<String> {
 ### 7. 错误处理
 
 **Classic Actor**
+
 ```java
 @Override
 public void preRestart(Throwable reason, Optional<Object> message) {
@@ -259,6 +279,7 @@ public void postRestart(Throwable reason) {
 ```
 
 **Typed Actor**
+
 ```java
 public class TypedEchoBehavior extends AbstractBehavior<String> {
     @Override
@@ -278,6 +299,7 @@ public class TypedEchoBehavior extends AbstractBehavior<String> {
 ```
 
 **对比要点**：
+
 - Typed Actor 在消息处理函数中抛出异常
 - 支持 `onFailure` 回调处理错误
 - 可以配置重启策略和超时
@@ -285,6 +307,7 @@ public class TypedEchoBehavior extends AbstractBehavior<String> {
 ### 8. 测试
 
 **Classic Actor 测试**
+
 ```java
 public class ClassicEchoActorTest extends TestKit {
     @Test
@@ -297,6 +320,7 @@ public class ClassicEchoActorTest extends TestKit {
 ```
 
 **Typed Actor 测试**
+
 ```java
 public class TypedEchoBehaviorTest extends TestKit {
     @Test
@@ -310,6 +334,7 @@ public class TypedEchoBehaviorTest extends TestKit {
 ```
 
 **对比要点**：
+
 - 两种方式测试 API 相似
 - Typed Actor 可以更精确地验证行为
 - 支持 `Behaviors.ignore()` 用于测试中忽略消息
@@ -317,6 +342,7 @@ public class TypedEchoBehaviorTest extends TestKit {
 ## 完整示例对比
 
 ### Classic Actor 实现
+
 ```java
 public class ClassicCounterActor extends AbstractActor {
     private int count = 0;
@@ -345,6 +371,7 @@ public class ClassicCounterActor extends AbstractActor {
 ```
 
 ### Typed Actor 实现
+
 ```java
 public class TypedCounterBehavior extends AbstractBehavior<String> {
     private int count = 0;
@@ -383,6 +410,7 @@ public class TypedCounterBehavior extends AbstractBehavior<String> {
 ## 优缺点对比
 
 ### Typed Actor 优点
+
 1. **类型安全**：编译期就能发现类型错误
 2. **API 清晰**：Java 和 Scala 各自有独立的 API
 3. **更好的组织**：鼓励状态模式，代码更易维护
@@ -391,16 +419,19 @@ public class TypedCounterBehavior extends AbstractBehavior<String> {
 6. **减少歧义**：移除了容易混淆的 sender/parent API
 
 ### Typed Actor 缺点
+
 1. **学习曲线**：需要适应新的状态管理模式
 2. **更多代码**：状态管理需要显式定义
 3. **API 改变**：需要适应新的消息处理方式
 
 ### Classic Actor 优点
+
 1. **熟悉**：API 简单直观，易于上手
 2. **灵活**：运行时才能发现类型错误
 3. **兼容性**：与现有系统集成更方便
 
 ### Classic Actor 缺点
+
 1. **类型不安全**：运行时才能发现类型错误
 2. **API 混乱**：容易混淆 sender/parent API
 3. **测试困难**：状态管理不明确

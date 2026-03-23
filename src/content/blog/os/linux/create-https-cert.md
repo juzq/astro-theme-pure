@@ -7,11 +7,13 @@ tags:
 ---
 
 ## 解析域名
-`ping 域名` 
+
+`ping 域名`
 
 确保域名解析到了到了正确的ip
 
 ## 关闭监听端口
+
 Let's Encrypt 的 Standalone 模式需要占用 80 或 443 端口来验证域名所有权。
 
 停止web服务，例如xray
@@ -19,6 +21,7 @@ Let's Encrypt 的 Standalone 模式需要占用 80 或 443 端口来验证域名
 `systemctl stop xray`
 
 ## 申请证书
+
 `certbot certonly --standalone -d 域名`
 
 证书位置： 申请成功后，证书通常存放在 /etc/letsencrypt/live/新域名.com/ 目录下。
@@ -42,10 +45,12 @@ chown -R nobody:nogroup /etc/letsencrypt/live/
 ## 修改web服务器的证书配置
 
 ### xray
+
 修改xray配置`/usr/local/etc/xray/config.json`
+
 ```
 "tlsSettings": {
-    "serverName": "新域名", 
+    "serverName": "新域名",
     "certificates": [
         {
             "certificateFile": "/etc/letsencrypt/live/新域名/fullchain.pem",
@@ -54,10 +59,13 @@ chown -R nobody:nogroup /etc/letsencrypt/live/
     ]
 }
 ```
+
 修改完成后，启动xray：`systemctl start xray`
 
 ## 自动续期
+
 创建脚本到文件：`/etc/xray/scripts/renew-hook.sh`
+
 ```
 #!/bin/bash
 
@@ -76,6 +84,7 @@ echo "[$CUR_TIME] 证书已成功更新并应用到 Xray" >> $LOG_FILE
 添加运行权限：`chmod +x /etc/xray/scripts/renew-hook.sh`
 
 执行更新命令
+
 ```
 certbot renew \
 --pre-hook "systemctl stop xray" \
@@ -83,9 +92,9 @@ certbot renew \
 --deploy-hook "/etc/xray/scripts/renew-hook.sh"
 ```
 
-* 若机器上有多个证书，可以添加`--cert-name 域名`来指定更新域名。
-* 若证书剩余30天以上，不会执行更新操作，也不会运行pre/post的hook，如果要强制运行，可以添加参数`--dry-run`来测试。
-* 即使加了`--dry-run`，也不会运行`--deploy-hook`，只有真实更新证书时才会运行，因此建议手动运行一次`renew-hook.sh`来测试。
+- 若机器上有多个证书，可以添加`--cert-name 域名`来指定更新域名。
+- 若证书剩余30天以上，不会执行更新操作，也不会运行pre/post的hook，如果要强制运行，可以添加参数`--dry-run`来测试。
+- 即使加了`--dry-run`，也不会运行`--deploy-hook`，只有真实更新证书时才会运行，因此建议手动运行一次`renew-hook.sh`来测试。
 
 ### 查看自动运行记录
 

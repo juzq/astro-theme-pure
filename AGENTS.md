@@ -201,6 +201,7 @@ export function exampleFunction(param: SomeType): ReturnType {
 5. **提交前**: 确保所有检查通过，更新 CHANGELOG（如适用）
 
 ## 注意事项
+
 - 请勿执行 git commit 命令，所有代码修改需经我确认后再手动提交
 
 ## 常见问题

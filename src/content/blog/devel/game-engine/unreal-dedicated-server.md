@@ -14,7 +14,7 @@ tags:
 
 ## 服务器构建
 
-&emsp;&emsp;在UE4编辑器中，我们只需要在播放（Play）选项中勾选运行独立服务器（Run Dedicated Server）即可在编辑器中运行独立服务器，并且客户端会自动连接到该服务器。那么如何构建出能独立运行的服务器呢？官网给出了一篇[指南](https://wiki.unrealengine.com/index.php?title=Dedicated_Server_Guide_(Windows_%26_Linux))，于是我根据这篇指南和我自己的理解开始了UE4服务器的构建。
+&emsp;&emsp;在UE4编辑器中，我们只需要在播放（Play）选项中勾选运行独立服务器（Run Dedicated Server）即可在编辑器中运行独立服务器，并且客户端会自动连接到该服务器。那么如何构建出能独立运行的服务器呢？官网给出了一篇[指南](<https://wiki.unrealengine.com/index.php?title=Dedicated_Server_Guide_(Windows_%26_Linux)>)，于是我根据这篇指南和我自己的理解开始了UE4服务器的构建。
 
 ### 编译虚幻引擎源码
 
@@ -70,7 +70,7 @@ Engine\Source\Programs\DotNETCommon\DotNETUtilities\DotNETUtilities.csproj
 &emsp;&emsp;继续进行下面的编译源码步骤后（耗时约8小时），会得到如下的报错：
 
 ```
-error MSB3075: The command "..\..\Build\BatchFiles\Build.bat exited with code 5. 
+error MSB3075: The command "..\..\Build\BatchFiles\Build.bat exited with code 5.
 Please verify that you have sufficient rights to run this command.
 ```
 

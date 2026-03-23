@@ -23,16 +23,19 @@
 ### 字符串格式化详解
 
 #### JSON 格式化
+
 - 自动检测并解析 JSON
 - 添加缩进和换行
 - 错误提示
 
 #### XML 格式化
+
 - 使用 DOMParser 解析 XML
 - 自动添加缩进和换行
 - 保留注释和结构
 
 #### Protobuf日志 格式化
+
 - 正确处理缩进
 - 移除额外日志内容
 
@@ -48,21 +51,25 @@
 ### 测试用例
 
 #### JSON 测试
+
 ```json
-{"name":"test","value":123,"items":["a","b","c"]}
+{ "name": "test", "value": 123, "items": ["a", "b", "c"] }
 ```
 
 #### XML 测试
+
 ```xml
 <root><child><name>test</name><value>123</value></child></root>
 ```
 
 #### Protobuf日志 测试
+
 ```
-16:21:59.252 DEBUG PUSH: Player-36028930895301130 SCAssetUpdate -> award { asset { sid: 2 num: 2 } asset { sid: 3 num: 2 } asset { sid: 1 num: 2 } } reason: "ItemReason(desc=内城资源产出, paramList=[])" source: AS_CITY_BUILDING_OUTPUT buildingResourceUpdate { infos { buildingSid: 70001 resourceSid: 1 resourceNum: 3244 } infos { buildingSid: 70001 resourceSid: 2 resourceNum: 3244 } infos { buildingSid: 70001 resourceSid: 3 resourceNum: 3844 } } | message_logger.$anonfun$applyOrElse$4(Slf4jLogger.scala:103)[mc-Nebula-akka.actor.logger-dispatcher-775] 
+16:21:59.252 DEBUG PUSH: Player-36028930895301130 SCAssetUpdate -> award { asset { sid: 2 num: 2 } asset { sid: 3 num: 2 } asset { sid: 1 num: 2 } } reason: "ItemReason(desc=内城资源产出, paramList=[])" source: AS_CITY_BUILDING_OUTPUT buildingResourceUpdate { infos { buildingSid: 70001 resourceSid: 1 resourceNum: 3244 } infos { buildingSid: 70001 resourceSid: 2 resourceNum: 3244 } infos { buildingSid: 70001 resourceSid: 3 resourceNum: 3844 } } | message_logger.$anonfun$applyOrElse$4(Slf4jLogger.scala:103)[mc-Nebula-akka.actor.logger-dispatcher-775]
 ```
 
 **格式化后结果：**
+
 ```protobuf
 award {
     asset {

@@ -6,12 +6,14 @@ tags:
   - java
 ---
 
-
 # 前言
+
 在java web项目中，maven也提供了“tomcat7-maven-plugin”这样的maven插件来使我们方便地将项目部署到服务器中的tomcat，下面就是我对配置步骤的总结。
 
 # Maven中的配置
+
 ## pom文件配置
+
 ```
 <plugins>
 	<plugin>
@@ -25,7 +27,9 @@ tags:
     </plugin>
 </plugins>
 ```
+
 注："server"标签要与C:\Users\\{User}\\.m2\settings.xml中配置的用户名和密码的id一致，例如：
+
 ```
 <server>
     <id>tomcat</id>
@@ -33,32 +37,40 @@ tags:
     <password>123456</password>
 </server>
 ```
+
 ## maven命令的配置
+
 需要使用tomcat7:redeploy，因为如果tomcat中已经发布好了该项目，使用deploy就无法再次发布。
 
-
-
-
 # Tomcat中的配置
+
 ## 用户配置
+
 在conf/tomcat-users.xml中添加：
+
 ```
 <role rolename="manager-gui"/>
 <role rolename="manager-script"/>
 <user username="test" password="123456" roles="manager-gui, manager-script"/>
 ```
+
 注：user标签中的用户名和密码要与C:\Users\\{User}\\.m2\settings.xml中配置的用户名和密码一致。
 
 ## 权限配置
+
 修改webapps/manager/META-INF/context.xml，将Value标签中的allow元素修改为
+
 ```
 <Valve className="org.apache.catalina.valves.RemoteAddrValve"
          allow="192.168.*.*|::1|0:0:0:0:0:0:0:1" />
 ```
+
 或者直接注释掉该标签也可以。
 
 ## war包大小限制
+
 Tomcat默认的war包限制为50M，若超过大小，则还需要修改webapps/manager/WEB-INF/web.xml中的
+
 ```
 <multipart-config>
       <!-- 50MB max -->
