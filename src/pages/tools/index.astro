@@ -466,5 +466,29 @@ const title = 'Tools'
     mark {
       font-weight: 500;
     }
+
+    /* 自定义滚动条样式 */
+    #text-input {
+      scrollbar-width: 16px;
+      scrollbar-color: #888 #f1f1f1;
+    }
+
+    #text-input::-webkit-scrollbar {
+      width: 16px;
+    }
+
+    #text-input::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 8px;
+    }
+
+    #text-input::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 8px;
+    }
+
+    #text-input::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
   </style>
 </PageLayout>
