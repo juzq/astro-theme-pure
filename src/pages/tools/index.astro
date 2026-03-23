@@ -198,13 +198,45 @@ const title = 'Tools'
         searchInput.value = ''
         matchInfo.textContent = '0 / 0'
         allMatches = []
+        
+        // 更新URL参数，添加tab参数
+        const url = new URL(window.location.href)
+        url.searchParams.set('tab', tabName as string)
+        history.replaceState(null, '', url.toString())
       })
     })
 
-    // 初始化选中第一个页签
-    tabButtons[0].classList.add('border-b-2', 'border-blue-600', 'text-blue-600')
-    document.getElementById('tab-format')?.classList.remove('hidden')
-    document.getElementById('tab-timestamp')?.classList.add('hidden')
+    // 从URL参数中获取tab值
+    function getTabFromUrl() {
+      const urlParams = new URLSearchParams(window.location.search)
+      return urlParams.get('tab')
+    }
+
+    // 初始化选中页签
+    function initTab() {
+      const tabFromUrl = getTabFromUrl()
+      let initialTab = 'format' // 默认标签
+
+      if (tabFromUrl === 'timestamp') {
+        initialTab = 'timestamp'
+      }
+
+      // 激活对应的标签按钮和内容
+      tabButtons.forEach((button) => {
+        const tabName = (button as HTMLElement).dataset.tab
+        if (tabName === initialTab) {
+          button.classList.add('border-b-2', 'border-blue-600', 'text-blue-600')
+        } else {
+          button.classList.remove('border-b-2', 'border-blue-600', 'text-blue-600')
+        }
+      })
+
+      tabContents.forEach((content) => content.classList.add('hidden'))
+      document.getElementById(`tab-${initialTab}`)?.classList.remove('hidden')
+    }
+
+    // 初始化标签
+    initTab()
 
     // 清空按钮
     clearBtn.addEventListener('click', () => {
