@@ -30,16 +30,16 @@ const title = 'Tools'
           <label class='block text-sm font-medium mb-2 min-w-[80px]'>字符串格式</label>
           <div class='flex gap-4'>
             <label class='flex items-center gap-2 cursor-pointer'>
-              <input type='radio' name='format-type' value='json' checked class='w-4 h-4' />
+              <input type='radio' name='format-type' value='protobuf' checked class='w-4 h-4' />
+              <span>Protobuf</span>
+            </label>
+            <label class='flex items-center gap-2 cursor-pointer'>
+              <input type='radio' name='format-type' value='json' class='w-4 h-4' />
               <span>JSON</span>
             </label>
             <label class='flex items-center gap-2 cursor-pointer'>
               <input type='radio' name='format-type' value='xml' class='w-4 h-4' />
               <span>XML</span>
-            </label>
-            <label class='flex items-center gap-2 cursor-pointer'>
-              <input type='radio' name='format-type' value='protobuf' class='w-4 h-4' />
-              <span>Protobuf</span>
             </label>
           </div>
           <div class='flex gap-2 ml-auto'>
@@ -69,8 +69,14 @@ const title = 'Tools'
               class='w-full px-4 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
           </div>
-          <div class='flex items-end pb-2'>
+          <div class='flex items-end pb-2 gap-2'>
             <span id='match-info' class='text-sm text-muted-foreground'>0 / 0</span>
+            <button
+              id='search-next-btn'
+              class='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm'
+            >
+              下一个
+            </button>
           </div>
         </div>
 
@@ -97,6 +103,7 @@ const title = 'Tools'
     const formatBtn = document.getElementById('format-btn')
     const clearBtn = document.getElementById('clear-btn')
     const searchInput = document.getElementById('search-input') as HTMLInputElement
+    const searchNextBtn = document.getElementById('search-next-btn')
     const textInput = document.getElementById('text-input') as HTMLTextAreaElement
     const matchInfo = document.getElementById('match-info') as HTMLSpanElement
     const formatRadios = document.querySelectorAll(
@@ -132,6 +139,26 @@ const title = 'Tools'
       matchInfo.textContent = '0 / 0'
     })
 
+    // 切换字符串格式时清空文本框
+    formatRadios.forEach((radio) => {
+      radio.addEventListener('change', () => {
+        textInput.value = ''
+        searchInput.value = ''
+        matchInfo.textContent = '0 / 0'
+      })
+    })
+
+    // 文本框输入时自动格式化（防抖）
+    let formatDebounceTimer: ReturnType<typeof setTimeout>
+    textInput.addEventListener('input', () => {
+      clearTimeout(formatDebounceTimer)
+      formatDebounceTimer = setTimeout(() => {
+        if (textInput.value.trim()) {
+          formatBtn.click()
+        }
+      }, 1000) // 1秒防抖
+    })
+
     // 格式化按钮
     formatBtn.addEventListener('click', () => {
       const formatType = Array.from(formatRadios).find((radio) => radio.checked)?.value
@@ -153,10 +180,14 @@ const title = 'Tools'
           case 'protobuf':
             formatProtobuf()
             break
+          default:
+            alert('请选择格式化类型')
         }
         // 格式化后清除搜索
         searchInput.value = ''
         matchInfo.textContent = '0 / 0'
+        // 文本框滚动到顶部
+        textInput.scrollTop = 0
       } catch (error) {
         alert('格式化失败：' + (error as Error).message)
       }
@@ -175,59 +206,61 @@ const title = 'Tools'
     // XML 格式化
     function formatXML() {
       try {
-        const parser = new DOMParser()
-        const xmlDoc = parser.parseFromString(textInput.value, 'text/xml')
-
-        if (xmlDoc.querySelector('parsererror')) {
-          throw new Error('无效的 XML 格式')
+        const text = textInput.value.trim()
+        if (!text) {
+          alert('请输入 XML 内容')
+          return
         }
 
-        const serializer = new XMLSerializer()
-        const formatted = serializer.serializeToString(xmlDoc)
+        // 简单的XML格式化逻辑，不依赖DOMParser
+        let indent = 0
+        let result = ''
+        let inTag = false
+        let tagContent = ''
 
-        textInput.value = formatXMLIndent(formatted)
-      } catch (error) {
-        alert('无效的 XML 格式')
-      }
-    }
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i]
 
-    // 格式化 XML 缩进（改进版）
-    function formatXMLIndent(xml: string): string {
-      const lines = xml.split('\n')
-      const result: string[] = []
-      let indentLevel = 0
-      const indentSize = 2
+          if (char === '<') {
+            if (tagContent.trim()) {
+              result += '  '.repeat(indent) + tagContent.trim() + '\n'
+              tagContent = ''
+            }
+            inTag = true
+            tagContent += char
+          } else if (char === '>') {
+            tagContent += char
+            inTag = false
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i]
-        const trimmed = line.trim()
-
-        // 跳过空行
-        if (!trimmed) {
-          result.push('')
-          continue
-        }
-
-        // 计算缩进级别
-        const openTagMatch = trimmed.match(/^<\/?(\w+)/)
-        if (openTagMatch) {
-          const tagName = openTagMatch[1]
-
-          // 检查是否是闭合标签
-          if (trimmed.startsWith('</')) {
-            indentLevel--
-          } else if (!trimmed.endsWith('/>')) {
-            // 不是自闭合标签，增加缩进
-            indentLevel++
+            // 检查是否是闭合标签
+            if (tagContent.startsWith('</')) {
+              indent--
+              result += '  '.repeat(indent) + tagContent + '\n'
+            } else if (tagContent.endsWith('/>')) {
+              // 自闭合标签
+              result += '  '.repeat(indent) + tagContent + '\n'
+            } else {
+              // 开始标签
+              result += '  '.repeat(indent) + tagContent + '\n'
+              indent++
+            }
+            tagContent = ''
+          } else if (inTag) {
+            tagContent += char
+          } else {
+            tagContent += char
           }
         }
 
-        // 添加缩进
-        const indent = '  '.repeat(indentLevel)
-        result.push(indent + trimmed)
-      }
+        // 处理剩余内容
+        if (tagContent.trim()) {
+          result += '  '.repeat(indent) + tagContent.trim() + '\n'
+        }
 
-      return result.join('\n')
+        textInput.value = result
+      } catch (error) {
+        alert('无效的 XML 格式')
+      }
     }
 
     // Protobuf 格式化
@@ -246,86 +279,62 @@ const title = 'Tools'
       }
     }
 
-    // 格式化 Protobuf 消息内容（只包含消息定义，去掉其他内容）
+    // 格式化 Protobuf 消息内容（处理日志格式）
     function formatProtobufMessage(text: string): string {
-      const lines = text.split('\n')
+      // 提取 -> 和 | 之间的内容
+      const match = text.match(/->\s*(.*?)\s*\|/s)
+      const protobufContent = match ? match[1] : text
+
+      // 按大括号和分号分割内容，保持键值对的完整性
       const result: string[] = []
       let indent = 0
-      let inMessage = false
+      let currentLine = ''
 
-      for (const line of lines) {
-        const trimmedLine = line.trim()
+      // 按字符处理，保持键值对的完整性
+      let i = 0
+      while (i < protobufContent.length) {
+        const char = protobufContent[i]
 
-        // 跳过空行
-        if (!trimmedLine) {
-          continue
-        }
-
-        // 检测消息开始
-        if (trimmedLine.startsWith('message ')) {
-          inMessage = true
-          result.push(''.repeat(indent) + trimmedLine)
+        if (char === ' ') {
+          // 跳过空格
+          if (currentLine) {
+            currentLine += ' '
+          }
+          i++
+        } else if (char === '{') {
+          if (currentLine) {
+            result.push('  '.repeat(indent) + currentLine.trim() + ' {')
+            currentLine = ''
+          } else {
+            result.push('  '.repeat(indent) + '{')
+          }
           indent++
-        }
-        // 检测消息结束
-        else if (trimmedLine === '}') {
+          i++
+        } else if (char === '}') {
+          if (currentLine) {
+            result.push('  '.repeat(indent) + currentLine.trim())
+            currentLine = ''
+          }
           indent--
-          inMessage = false
-        }
-        // 只在消息块内处理字段
-        else if (inMessage) {
-          // 检测字段定义
-          const fieldMatch = trimmedLine.match(
-            /^(repeated|required|optional)\s+(\w+)\s+(\w+)\s*=\s*(\d+)(?:;\s*\/\/\s*(.+))?/
-          )
-          if (fieldMatch) {
-            const [, type, name, number, comment] = fieldMatch
-            result.push(
-              ''.repeat(indent) +
-                `${type} ${typeMap[type]} ${name} = ${number}; // ${comment || ''}`
-            )
-          }
-          // 检测枚举值
-          else if (trimmedLine.match(/^  \w+\s*=\s*\d+;$/)) {
-            result.push(''.repeat(indent) + trimmedLine)
-          }
-          // 检测嵌套消息开始
-          else if (trimmedLine.startsWith('message ')) {
-            result.push(''.repeat(indent) + trimmedLine)
-            indent++
-          }
-          // 检测嵌套消息结束
-          else if (trimmedLine === '}') {
-            indent--
-          }
-          // 其他行（如注释）直接保留
-          else if (trimmedLine.startsWith('//') || trimmedLine.startsWith('#')) {
-            result.push(''.repeat(indent) + trimmedLine)
-          }
-          // 忽略其他内容
+          result.push('  '.repeat(indent) + '}')
+          i++
+        } else if (char === ';') {
+          currentLine += char
+          result.push('  '.repeat(indent) + currentLine.trim())
+          currentLine = ''
+          i++
+        } else {
+          currentLine += char
+          i++
         }
       }
 
-      return result.join('\n')
-    }
+      // 添加最后一行（如果有）
+      if (currentLine.trim()) {
+        result.push('  '.repeat(indent) + currentLine.trim())
+      }
 
-    // Protobuf 类型映射
-    const typeMap: Record<string, string> = {
-      int32: 'int32',
-      int64: 'int64',
-      uint32: 'uint32',
-      uint64: 'uint64',
-      sint32: 'sint32',
-      sint64: 'sint64',
-      fixed32: 'fixed32',
-      fixed64: 'fixed64',
-      sfixed32: 'sfixed32',
-      sfixed64: 'sfixed64',
-      float: 'float',
-      double: 'double',
-      bool: 'bool',
-      string: 'string',
-      bytes: 'bytes'
+      return result.join('\n')
     }
 
     // 搜索相关
@@ -341,12 +350,31 @@ const title = 'Tools'
       }, 300)
     })
 
-    // 回车键跳转到下一个匹配项
+    // 回车键跳转到匹配项
     searchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault()
-        moveToNextMatch()
+        // 如果还没有匹配项，先执行搜索
+        if (!allMatches || allMatches.length === 0) {
+          performSearch()
+        }
+        // 显示当前匹配项（从第一个开始）
+        showHighlightAndScroll()
+        // 准备下一次跳转
+        currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
       }
+    })
+
+    // 搜索按钮点击事件
+    searchNextBtn?.addEventListener('click', () => {
+      // 如果还没有匹配项，先执行搜索
+      if (!allMatches || allMatches.length === 0) {
+        performSearch()
+      }
+      // 显示当前匹配项
+      showHighlightAndScroll()
+      // 准备下一次跳转
+      currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
     })
 
     function performSearch() {
@@ -364,8 +392,11 @@ const title = 'Tools'
         return
       }
 
+      updateMatchDisplay()
+      // 显示高亮并滚动到匹配项
+      showHighlightAndScroll()
+      // 准备下一次跳转
       currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
-      highlightMatch(allMatches[currentMatchIndex])
     }
 
     function updateMatchDisplay() {
@@ -374,28 +405,43 @@ const title = 'Tools'
         return
       }
 
-      matchInfo.textContent = `${currentMatchIndex + 1} / ${allMatches.length}`
+      // 显示当前匹配项的序号（从1开始）
+      const currentDisplayIndex = (currentMatchIndex % allMatches.length) + 1
+      matchInfo.textContent = `${currentDisplayIndex} / ${allMatches.length}`
     }
 
-    function highlightMatch(matchText: string) {
+    function showHighlightAndScroll() {
       const text = textInput.value
       const searchPattern = searchInput.value.trim()
 
       if (!searchPattern) {
-        textInput.value = text
         return
       }
 
-      // 创建高亮标记
-      const regex = new RegExp(
-        searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-        'gi'
-      )
+      // 找到匹配项的位置
+      const regex = new RegExp(searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
 
-      // 替换所有匹配项为高亮格式
-      textInput.value = text.replace(regex, (match) => {
-        return `<mark class="bg-yellow-200 dark:bg-yellow-900/50 px-1 rounded">${match}</mark>`
-      })
+      let match
+      let matches = []
+      while ((match = regex.exec(text)) !== null) {
+        matches.push({ start: match.index, end: match.index + match[0].length })
+      }
+
+      // 如果有匹配项，显示高亮并滚动
+      if (matches.length > 0) {
+        const targetIndex = currentMatchIndex % matches.length
+        const targetMatch = matches[targetIndex]
+
+        // 聚焦文本框以显示选择
+        textInput.focus()
+        textInput.setSelectionRange(targetMatch.start, targetMatch.end)
+
+        // 滚动到匹配项位置
+        textInput.scrollTop = Math.max(
+          0,
+          (targetMatch.start / text.length) * textInput.scrollHeight - textInput.clientHeight / 2
+        )
+      }
     }
 
     // 初始化
