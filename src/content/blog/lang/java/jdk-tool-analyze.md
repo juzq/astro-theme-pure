@@ -4,8 +4,6 @@ publishDate: 2018-02-26
 description: JDK自带了许多工具来对java进程进行分析，从基础工具到进阶工具的完整指南
 tags:
   - java
-  - 性能分析
-  - 调试工具
 ---
 
 # 问题背景
@@ -17,7 +15,6 @@ tags:
 # 常用JDK自带工具
 
 ## jinfo
-
 显示 JVM 的详细信息，可以查看和修改运行时参数
 
 **用法**：
@@ -29,7 +26,6 @@ tags:
 连接到远程调试服务器：`jinfo [option] [server_id@]<remote server IP or hostname>`
 
 **参数介绍**：
-
 ```
 -flag <name> 打印指定变量名的虚拟机参数
 -flag [+|-]<name> 启用或禁用指定变量名的虚拟机参数
@@ -41,7 +37,6 @@ tags:
 ```
 
 **常用示例**：
-
 ```bash
 # 查看所有 JVM 参数
 jinfo <pid>
@@ -57,7 +52,6 @@ jinfo -flag:MaxPermSize=512m <pid>
 ```
 
 ## jmap
-
 获得运行中的 JVM 的堆的快照，从而可以离线分析堆，以检查内存泄漏，检查一些严重影响性能的大对象的创建，检查系统中什么对象最多，各种对象所占内存的大小等等
 
 **用法**：
@@ -69,7 +63,6 @@ jinfo -flag:MaxPermSize=512m <pid>
 连接到远程调试服务器：`jmap [option] [server_id@]<remote server IP or hostname>`
 
 **参数介绍**：
-
 ```
 <无参数> 打印与Solaris pmap相同的信息
 -heap 打印Java堆的汇总信息
@@ -86,7 +79,6 @@ jinfo -flag:MaxPermSize=512m <pid>
 ```
 
 **常用示例**：
-
 ```bash
 # 查看堆内存使用情况
 jmap -heap <pid>
@@ -102,7 +94,6 @@ jmap -dump:live,format=b,file=heap.bin <pid>
 ```
 
 ## jps
-
 jps (Java Virtual Machine Process Status Tool) 是 JDK 1.5 提供的一个显示当前所有 java 进程 pid 的命令，可以显示主机中运行的 java 进程，与 bash 命令 `ps -ef | grep java` 很类似
 
 **用法**：
@@ -110,7 +101,6 @@ jps (Java Virtual Machine Process Status Tool) 是 JDK 1.5 提供的一个显示
 `jps [-q] [-mlvV] [<hostid>]`
 
 **参数介绍**：
-
 ```
 -q 安静模式，只显示进程id
 -m 输出传递给main方法的参数
@@ -120,7 +110,6 @@ jps (Java Virtual Machine Process Status Tool) 是 JDK 1.5 提供的一个显示
 ```
 
 **常用示例**：
-
 ```bash
 # 显示所有 Java 进程
 jps
@@ -133,7 +122,6 @@ jps -q
 ```
 
 ## jstack
-
 输出指定 Java 进程的线程堆栈信息
 
 **用法**：
@@ -147,14 +135,12 @@ jps -q
 连接到远程调试服务器：`jstack [-m] [-l] [server_id@]<remote server IP or hostname>`
 
 **参数介绍**：
-
 ```
 -l 输出同步锁信息
 -m 检测死锁并输出线程的栈信息
 ```
 
 **常用示例**：
-
 ```bash
 # 查看线程堆栈
 jstack <pid>
@@ -173,7 +159,6 @@ jstack -F <pid>
 ```
 
 ## jstat
-
 对 java 进程的资源和性能进行实时的监控，包括了对该进程的 classloader、compiler、gc 情况。也可以监视虚拟机内存内的堆和非堆的大小及其内存使用量，以及加载类的数量
 
 **用法**：
@@ -204,7 +189,6 @@ jstack -F <pid>
 ```
 
 **常用示例**：
-
 ```bash
 # 每 1 秒统计一次 GC 信息
 jstat -gc <pid> 1000
@@ -225,7 +209,6 @@ jstat -gccapacity <pid> 1000
 # 进阶 JDK 工具
 
 ## jcmd
-
 jcmd 是 JDK 8 引入的通用诊断命令行工具，集成了 jps、jstat、jmap、jstack 等工具的功能。通过 jcmd 可以执行多种诊断操作，是 Java 8+ 推荐的诊断工具
 
 **用法**：
@@ -299,14 +282,12 @@ jcmd <pid> JFR.print name=recording filename=/tmp/recording.jfr
 ```
 
 **jcmd 优势**：
-
 - 统一的命令行接口
 - 支持交互式命令
 - 功能丰富，覆盖多种诊断场景
 - 比 jstack 等工具更强大和灵活
 
 ## VisualVM
-
 VisualVM 是 Oracle 推出的免费性能监控和故障诊断工具，集成了多种 JDK 监控功能。它提供直观的图形界面，支持堆转储分析、线程分析、性能监控等
 
 **功能特性**：
@@ -336,7 +317,6 @@ VisualVM 是 Oracle 推出的免费性能监控和故障诊断工具，集成了
 ### 4. 插件系统
 
 VisualVM 支持多种插件扩展功能：
-
 - **BTrace**：运行时字节码修改和监控
 - **VisualGC**：详细的 GC 信息可视化
 - **JFR Viewer**：Java Flight Recorder 文件查看
@@ -368,7 +348,6 @@ visualvm --openpid <pid>
    - 导出监控数据
 
 ## jconsole
-
 jconsole 是 JDK 自带的图形化监控工具，可以监控本地和远程 JVM 的性能指标
 
 **功能特性**：
@@ -409,14 +388,12 @@ jconsole localhost:5005
 ```
 
 **常用场景**：
-
 - 实时监控 JVM 性能指标
 - 查看线程状态和堆栈
 - 监控内存使用情况
 - 检查类加载情况
 
 ## Java Flight Recorder (JFR)
-
 JFR 是 JDK 9 引入的低开销性能分析工具，能够在不显著影响应用性能的情况下收集详细的性能数据
 
 **特点**：
@@ -478,20 +455,19 @@ jmc
 
 **JFR vs 其他工具对比**：
 
-| 特性       | JFR        | VisualVM | jstat  |
-| ---------- | ---------- | -------- | ------ |
-| 开销       | 极低 (<1%) | 较高     | 低     |
-| 分析精度   | 高         | 中       | 低     |
-| 长时间运行 | 支持       | 不支持   | 不支持 |
-| 实时监控   | 不支持     | 支持     | 支持   |
-| 事件追溯   | 支持       | 不支持   | 不支持 |
+| 特性 | JFR | VisualVM | jstat |
+|------|-----|----------|-------|
+| 开销 | 极低 (<1%) | 较高 | 低 |
+| 分析精度 | 高 | 中 | 低 |
+| 长时间运行 | 支持 | 不支持 | 不支持 |
+| 实时监控 | 不支持 | 支持 | 支持 |
+| 事件追溯 | 支持 | 不支持 | 不支持 |
 
 # 线上常见问题的定位与思路
 
 ## 频繁GC或内存溢出
 
 **问题特征**：
-
 - 应用响应变慢
 - OOM 错误
 - GC 日志频繁出现
@@ -499,7 +475,6 @@ jmc
 **分析步骤**：
 
 1. **监控 GC 情况**
-
    ```bash
    # 查看详细 GC 日志
    jstat -gc <pid> 1000
@@ -512,7 +487,6 @@ jmc
    ```
 
 2. **生成堆转储**
-
    ```bash
    # 生成堆转储（只包含活跃对象）
    jmap -dump:live,format=b,file=heap.bin <pid>
@@ -532,7 +506,6 @@ jmc
    - 找出内存泄漏点
 
 **示例分析流程**：
-
 ```bash
 # 1. 持续监控
 while true; do jstat -gcutil <pid> 1000; sleep 1; done
@@ -557,7 +530,6 @@ mat /tmp/heap.bin
 ## 线程死锁问题
 
 **问题特征**：
-
 - 应用卡住
 - 响应缓慢
 - 线程状态分析显示线程阻塞
@@ -565,7 +537,6 @@ mat /tmp/heap.bin
 **分析步骤**：
 
 1. **检查线程状态**
-
    ```bash
    # 查看线程堆栈
    jstack <pid> > thread_dump.txt
@@ -586,7 +557,6 @@ mat /tmp/heap.bin
    ```
 
 **死锁示例**：
-
 ```
 "Thread-1" #10 prio=5 os_prio=0 tid=0x00007f8c8c0a5100 nid=0x4b03 runnable [0x000070000e2ff000]
    java.lang.Thread.State: RUNNABLE
@@ -614,7 +584,6 @@ Java stack information for the threads listed above:
 ```
 
 **解决方案**：
-
 - 优化锁的获取顺序
 - 使用锁超时机制
 - 使用可中断锁
@@ -623,7 +592,6 @@ Java stack information for the threads listed above:
 ## CPU 占用过高
 
 **问题特征**：
-
 - CPU 使用率异常高
 - 应用响应缓慢
 - 某些方法执行时间过长
@@ -631,7 +599,6 @@ Java stack information for the threads listed above:
 **分析步骤**：
 
 1. **查看 CPU 使用率**
-
    ```bash
    # 查看进程 CPU 使用率
    top -p <pid>
@@ -644,7 +611,6 @@ Java stack information for the threads listed above:
    ```
 
 2. **分析线程状态**
-
    ```bash
    # 查看线程堆栈
    jstack <pid> > thread_dump.txt
@@ -659,7 +625,6 @@ Java stack information for the threads listed above:
    - 定位热点方法
 
 4. **生成 CPU profile**
-
    ```bash
    # 使用 jstack 生成线程转储
    jstack <pid> > thread_dump.txt
@@ -688,7 +653,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
 ```
 
 **常见原因**：
-
 - 无限循环
 - 复杂算法
 - 网络超时等待
@@ -698,7 +662,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
 ## 内存泄漏
 
 **问题特征**：
-
 - 内存使用持续增长
 - OOM 错误
 - 堆转储分析发现对象未被释放
@@ -706,7 +669,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
 **分析步骤**：
 
 1. **监控内存增长**
-
    ```bash
    # 持续监控 GC 统计
    while true; do jstat -gc <pid> 1000; sleep 1; done
@@ -719,7 +681,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
    ```
 
 2. **对比堆转储**
-
    ```bash
    # 生成初始堆转储
    jmap -dump:live,format=b,file=heap_initial.bin <pid>
@@ -740,7 +701,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
 **常见泄漏原因**：
 
 1. **静态集合类泄漏**
-
    ```java
    // 问题代码
    private static final Map<String, Object> cache = new HashMap<>();
@@ -748,7 +708,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
    ```
 
 2. **监听器和回调未移除**
-
    ```java
    // 问题代码
    eventListener.addListener(new MyListener());
@@ -756,7 +715,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
    ```
 
 3. **ThreadLocal 泄漏**
-
    ```java
    // 问题代码
    ThreadLocal<Object> local = new ThreadLocal<>();
@@ -772,7 +730,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
    ```
 
 **解决方案**：
-
 - 使用弱引用和软引用
 - 及时移除监听器
 - 正确管理 ThreadLocal
@@ -782,7 +739,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
 ## 响应时间过长
 
 **问题特征**：
-
 - 请求响应变慢
 - 接口超时
 - 系统吞吐量下降
@@ -790,7 +746,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
 **分析步骤**：
 
 1. **监控性能指标**
-
    ```bash
    # 监控 GC
    jstat -gcutil <pid> 1000
@@ -805,7 +760,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
    ```
 
 2. **分析线程状态**
-
    ```bash
    # 查看线程堆栈
    jstack <pid> > thread_dump.txt
@@ -815,7 +769,6 @@ grep -A 30 "0x<hex_thread_id>" thread_dump.txt
    ```
 
 3. **分析网络延迟**
-
    ```bash
    # 查看 TCP 连接
    netstat -anp | grep <pid>
@@ -876,7 +829,6 @@ grep "BLOCKED" thread_dump.txt
    - 内存不足
 
 **解决方案**：
-
 - 优化线程池配置
 - 优化数据库查询
 - 添加监控和告警
@@ -891,7 +843,6 @@ grep "BLOCKED" thread_dump.txt
 ### 1. 采集数据
 
 **监控指标**：
-
 - CPU 使用率
 - 内存使用情况
 - GC 统计信息
@@ -899,7 +850,6 @@ grep "BLOCKED" thread_dump.txt
 - 系统资源
 
 **采集频率**：
-
 - 实时监控：1秒间隔
 - 堆转储：问题发生时
 - 线程转储：定期或触发时
@@ -907,7 +857,6 @@ grep "BLOCKED" thread_dump.txt
 ### 2. 数据分析
 
 **工具选择**：
-
 - `jstat`：快速查看 GC 情况
 - `jmap`：生成堆转储分析
 - `jstack`：查看线程状态
@@ -919,7 +868,6 @@ grep "BLOCKED" thread_dump.txt
 ### 3. 定位问题
 
 **分析方法**：
-
 - 热点分析：找出 CPU 消耗高的方法
 - 内存分析：找出占用内存多的对象
 - 线程分析：找出阻塞或死锁的线程
@@ -928,7 +876,6 @@ grep "BLOCKED" thread_dump.txt
 ### 4. 解决问题
 
 **优化策略**：
-
 - 代码优化：优化算法和逻辑
 - 配置优化：调整 JVM 参数和系统配置
 - 架构优化：改进系统架构
@@ -939,7 +886,6 @@ grep "BLOCKED" thread_dump.txt
 ### 1. 问题发生前
 
 **预防性监控**：
-
 - 启用 GC 日志
 - 设置内存监控
 - 记录性能基线
@@ -948,7 +894,6 @@ grep "BLOCKED" thread_dump.txt
 ### 2. 问题发生时
 
 **紧急采集**：
-
 - 生成堆转储
 - 生成线程转储
 - 记录时间戳
@@ -957,7 +902,6 @@ grep "BLOCKED" thread_dump.txt
 ### 3. 问题解决后
 
 **验证和优化**：
-
 - 验证问题已解决
 - 重新采集性能数据
 - 对比优化前后的数据
@@ -965,14 +909,14 @@ grep "BLOCKED" thread_dump.txt
 
 ## 工具选择指南
 
-| 问题类型       | 推荐工具             | 优先级 |
-| -------------- | -------------------- | ------ |
-| **内存泄漏**   | jmap + MAT, VisualVM | 高     |
-| **频繁 GC**    | jstat, jcmd          | 高     |
-| **线程死锁**   | jstack, jcmd         | 高     |
-| **CPU 高**     | jstack, jstack -l    | 高     |
-| **性能瓶颈**   | VisualVM, JFR        | 中     |
-| **长时间运行** | JFR                  | 高     |
+| 问题类型 | 推荐工具 | 优先级 |
+|---------|---------|--------|
+| **内存泄漏** | jmap + MAT, VisualVM | 高 |
+| **频繁 GC** | jstat, jcmd | 高 |
+| **线程死锁** | jstack, jcmd | 高 |
+| **CPU 高** | jstack, jstack -l | 高 |
+| **性能瓶颈** | VisualVM, JFR | 中 |
+| **长时间运行** | JFR | 高 |
 
 ## 自动化分析脚本
 
@@ -1076,23 +1020,23 @@ while true; do
     echo "=== 系统监控 ==="
     echo "时间: $(date)"
     echo ""
-
+    
     # CPU 使用率
     CPU=$(top -p $PID -n 1 -b | grep $PID | awk '{print $9}')
     echo "CPU 使用率: ${CPU}%"
-
+    
     # 内存使用
     MEM=$(top -p $PID -n 1 -b | grep $PID | awk '{print $6}')
     echo "内存使用: ${MEM} KB"
-
+    
     # 线程数
     THREADS=$(jstack $PID | grep -c "^")
     echo "线程数: $THREADS"
-
+    
     # 堆内存
     HEAP=$(jstat -gcutil $PID 1000 | tail -1 | awk '{print $4}')
     echo "堆内存使用: ${HEAP}%"
-
+    
     echo ""
     echo "按 Ctrl+C 停止"
     sleep $INTERVAL
@@ -1180,18 +1124,18 @@ echo "  - 如果有死锁，查看 jstack -m 输出"
 
 ## 工具速查
 
-| 问题                 | 命令                                           | 说明              |
-| -------------------- | ---------------------------------------------- | ----------------- |
-| 查看 JVM 参数        | `jinfo <pid>`                                  | 查看所有 JVM 参数 |
-| 查看 GC 情况         | `jstat -gcutil <pid>`                          | 查看 GC 统计      |
-| 查看 GC 原因         | `jstat -gccause <pid>`                         | 查看 GC 原因      |
-| 生成堆转储           | `jmap -dump:live,format=b,file=heap.bin <pid>` | 生成二进制堆转储  |
-| 查看对象分布         | `jmap -histo:live <pid>`                       | 查看对象统计      |
-| 查看线程堆栈         | `jstack <pid>`                                 | 生成线程转储      |
-| 查看线程堆栈（详细） | `jstack -l <pid>`                              | 包含锁信息        |
-| 查看线程状态         | `jcmd <pid> Thread.print`                      | 详细线程信息      |
-| 查看 GC 堆信息       | `jcmd <pid> GC.heap_info`                      | 堆统计信息        |
-| 启动 JFR             | `jcmd <pid> JFR.start name=recording`          | 开始性能记录      |
+| 问题 | 命令 | 说明 |
+|------|------|------|
+| 查看 JVM 参数 | `jinfo <pid>` | 查看所有 JVM 参数 |
+| 查看 GC 情况 | `jstat -gcutil <pid>` | 查看 GC 统计 |
+| 查看 GC 原因 | `jstat -gccause <pid>` | 查看 GC 原因 |
+| 生成堆转储 | `jmap -dump:live,format=b,file=heap.bin <pid>` | 生成二进制堆转储 |
+| 查看对象分布 | `jmap -histo:live <pid>` | 查看对象统计 |
+| 查看线程堆栈 | `jstack <pid>` | 生成线程转储 |
+| 查看线程堆栈（详细） | `jstack -l <pid>` | 包含锁信息 |
+| 查看线程状态 | `jcmd <pid> Thread.print` | 详细线程信息 |
+| 查看 GC 堆信息 | `jcmd <pid> GC.heap_info` | 堆统计信息 |
+| 启动 JFR | `jcmd <pid> JFR.start name=recording` | 开始性能记录 |
 
 ## 性能指标
 
