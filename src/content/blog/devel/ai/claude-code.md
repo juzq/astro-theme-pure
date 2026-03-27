@@ -14,51 +14,114 @@ tags:
 npm install -g @anthropic-ai/claude-code
 ```
 
-注意：如无国外网络，macOS或Linux不能使用`curl -fsSL https://claude.ai/install.sh | bash`来安装。
+注意：如无国外网络，macOS或Linux则不能使用`curl -fsSL https://claude.ai/install.sh | bash`来安装。
 
 验证安装
+
 ```
 claude --version
 ```
 
 ### 配置模型
-如使用官方模型（需要梯子），首次运行claude时会提示登录，也可以使用`/login`命令来登录
 
-#### 接入第三方模型
+#### 官方模型
+
+必须要梯子，首次运行claude时会提示登录，也可以使用`/login`命令来登录。
+
+#### 第三方模型
 
 创建文件：`~/.claude/settings.json`，内容为：
+
 ```
 {
   "env": {
     "ANTHROPIC_AUTH_TOKEN": "<api_key>",
     "ANTHROPIC_BASE_URL": "<url>",
-    "API_TIMEOUT_MS": "3000000",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1
+    "ANTHROPIC_MODEL": "<model>"
   }
 }
 ```
-- 将`<api_key>`替换为实际的api key
-- 将`<url>`替换为实际的api地址
+
+- 将`<api_key>`替换为实际的api key，从模型提供商那里获取。
+- 将`<url>`替换为实际的api地址，从模型提供商那里获取。
+- 将`<model>`替换为实际的模型名字，例如MiniMax M2.7。
 
 创建文件：`~/.claude.json`，内容为：
+
 ```
 {
   "hasCompletedOnboarding": true
 }
 ```
 
-##### 智谱
-[智谱AI开放平台](https://bigmodel.cn/)
+注意：如果不设置该属性，启动claude就会提示你登录，无法使用第三方模型。
 
-修改`~/.claude/settings.json`，设置模型：
+### 基本使用
+
+#### 启动对话
+
 ```
-{
-  "env": {
-    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-4.7",
-    "ANTHROPIC_DEFAULT_SONNET_MODEL": "GLM-4.7",
-    "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-4.5-Air"
-  }
-}
+claude                    # 启动默认对话
+claude <prompt>          # 直接执行命令
+claude --resume <会话名>  # 恢复之前的会话
 ```
 
-如果不修改，以上模型就是默认值。
+#### 核心命令
+
+```
+/help      # 显示帮助信息
+/compact   # 压缩当前会话上下文
+/model     # 切换模型
+Exit       # 退出会话
+```
+
+#### 模式切换
+
+```
+/browse    # 启用浏览模式，让AI主动浏览网页
+/eval      # 单行评估模式
+/improve   # 改进模式，针对当前选中内容
+```
+
+#### 管道操作
+
+```
+cat file.txt | claude "解释这段代码"
+```
+
+### 常见问题
+
+#### Q: 提示 "Permission denied"
+
+**A:** 检查 `~/.claude` 目录权限，确保当前用户有读写权限：
+
+```
+chmod 755 ~/.claude
+```
+
+#### Q: 第三方模型调用失败
+
+**A:**
+
+1. 确认 API Key 有效且未过期
+2. 检查 `ANTHROPIC_BASE_URL` 是否正确（有些需要完整的 v1 路径）
+3. 确认模型名称是否与提供商支持的一致
+
+#### Q: 上下文窗口满了
+
+**A:** 使用 `/compact` 命令压缩上下文，或开启新会话继续工作。
+
+#### Q: 网络连接问题
+
+**A:**
+
+- 确认环境变量 `HTTP_PROXY` / `HTTPS_PROXY` 已正确设置
+- 第三方模型确保 `ANTHROPIC_BASE_URL` 可达
+
+#### Q: 如何让AI不使用某个工具？
+
+**A:** 使用 `/no<tool>` 命令，例如 `/nobrowse` 禁用浏览模式。
+
+#### Q: 想查看更多调试信息？
+
+**A:** 设置环境变量 `CLAUDE_DEBUG=1` 可以看到详细日志。
