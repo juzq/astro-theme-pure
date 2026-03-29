@@ -4,6 +4,7 @@ publishDate: 2026-03-25
 description: Claude Code 是 Anthropic 官方推出的终端AI编程助手，直接集成在命令行环境中。比网页版更深入代码本身，能真正帮你完成开发任务，而非仅仅回答问题。适合日常开发中的代码生成、调试、重构等场景。
 tags:
   - AI
+  - Claude
 ---
 
 ### 安装
@@ -73,8 +74,9 @@ claude --dangerously-skip-permissions # 跳过危险权限确认
 ```
 /help      # 显示帮助信息
 /compact   # 压缩当前会话上下文
+/clear     # 清空上下文
 /model     # 切换模型
-Exit       # 退出会话
+/exit      # 退出会话
 ```
 
 #### 模式切换
@@ -90,6 +92,14 @@ Exit       # 退出会话
 ```
 cat file.txt | claude "解释这段代码"
 ```
+
+#### 指定文件
+
+```
+@文件名 要做的操作
+```
+
+可以直接告诉 AI 要操作哪个文件，更加高效。
 
 ### 常见问题
 
