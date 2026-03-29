@@ -61,9 +61,11 @@ claude --version
 #### 启动对话
 
 ```
-claude                    # 启动默认对话
-claude <prompt>          # 直接执行命令
-claude --resume <会话名>  # 恢复之前的会话
+claude                                # 启动默认对话
+claude <prompt>                       # 直接执行命令
+claude --model <model>                # 指定模型名字
+claude --r <session>                  # 恢复之前的会话，不填会话名会打开菜单供选择
+claude --dangerously-skip-permissions # 跳过危险权限确认
 ```
 
 #### 核心命令
