@@ -46,7 +46,7 @@ const { class: className } = Astro.props
         el: '#waline',
         serverURL: walineConfig.server || '',
         emoji,
-        reaction: ['/icons/heart-item.svg'],
+        lang: 'zh-CN',
         ...walineConfig.additionalConfigs
       })
     }
@@ -111,57 +111,6 @@ const { class: className } = Astro.props
   }
   #waline :global(a) {
     display: inline-block;
-  }
-
-  /* Reaction buttons */
-  #waline :global(.wl-reaction-title, .wl-reaction-text) {
-    display: none;
-  }
-  #waline :global(.wl-reaction) {
-    overflow: visible;
-    margin-bottom: 0.5em;
-  }
-  #waline :global(.wl-reaction-img) {
-    width: auto;
-    display: flex;
-    height: 35px;
-    align-items: center;
-    column-gap: 0.4rem;
-  }
-  #waline :global(.wl-reaction-votes) {
-    position: inherit;
-    top: inherit;
-    min-width: inherit;
-    inset-inline-end: inherit;
-    display: flex;
-    font-weight: normal;
-    border: none;
-    background: none;
-    color: inherit;
-    padding: 0.2rem 0.4rem;
-    border-radius: 6px;
-  }
-  #waline :global(.wl-reaction-loading) {
-    position: inherit;
-    top: inherit;
-    min-width: inherit;
-  }
-  #waline :global(.wl-reaction-item.active .wl-reaction-votes) {
-    background: var(--waline-theme-color);
-    color: var(--waline-bg-color);
-  }
-  #waline :global(.wl-reaction-votes:after) {
-    margin-left: 0.25em;
-    content: 'Like(s)';
-    display: inline-block;
-    clear: both;
-    border: 0;
-  }
-  #waline :global(.wl-reaction img) {
-    filter: invert(25%);
-  }
-  :global(.dark) #waline :global(.wl-reaction img) {
-    filter: invert(75%);
   }
 
   /* Subscription buttons - ensure horizontal layout */
