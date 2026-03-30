@@ -163,4 +163,24 @@ const { class: className } = Astro.props
   :global(.dark) #waline :global(.wl-reaction img) {
     filter: invert(75%);
   }
+
+  /* Subscription buttons - ensure horizontal layout */
+  #waline :global(.wl-meta-foot) {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+  #waline :global(.wl-rss) {
+    display: flex !important;
+    flex-direction: row !important;
+    max-width: none !important;
+    overflow: visible !important;
+    gap: 0.75rem;
+  }
+  #waline :global(.wl-rss > a) {
+    display: flex !important;
+    flex-shrink: 0;
+  }
+  #waline :global(.wl-rss:hover) {
+    max-width: none !important;
+  }
 </style>
