@@ -75,6 +75,7 @@ claude --dangerously-skip-permissions # 跳过危险权限确认
 /help      # 显示帮助信息
 /compact   # 压缩当前会话上下文
 /clear     # 清空上下文
+/rewind    # 恢复代码和对话到上一个检查点
 /model     # 切换模型
 /exit      # 退出会话
 ```
