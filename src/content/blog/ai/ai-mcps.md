@@ -32,27 +32,52 @@ MCP 采用客户端/服务器架构：
 | 部署 | 本地 MCP Server | 云端函数 |
 | 扩展性 | 可连接任何支持 MCP 的数据源 | 受限于厂商提供的函数库 |
 
-#### 配置方法
+### 配置方法
 
-MCP 配置文件使用 JSON 格式：
+#### 添加MCP
 
-- **全局 MCP**：`~/.claude/mcp.json` - 所有项目共享
-- **项目 MCP**：`.mcp.json` - 仅当前项目生效
+使用命令：
 
-配置结构示例：
+```
+claude mcp add -s user <mcp_name> <command> <args>
+```
 
-```json
-{
-  "mcpServers": {
-    "server-name": {
-      "command": "uvx",
-      "args": ["mcp-server-package"],
-      "env": {
-        "API_KEY": "sk-xxxx"
-      }
-    }
-  }
-}
+命令说明：
+
+```
+Usage: claude mcp add [options] <name> <commandOrUrl> [args...]
+
+Options:
+  --callback-port <port>       Fixed port for OAuth callback (for servers requiring pre-registered redirect URIs)
+  --client-id <clientId>       OAuth client ID for HTTP/SSE servers
+  --client-secret              Prompt for OAuth client secret (or set MCP_CLIENT_SECRET env var)
+  -e, --env <env...>           Set environment variables (e.g. -e KEY=value)
+  -H, --header <header...>     Set WebSocket headers (e.g. -H "X-Api-Key: abc123" -H "X-Custom: value")
+  -h, --help                   Display help for command
+  -s, --scope <scope>          Configuration scope (local, user, or project) (default: "local")
+  -t, --transport <transport>  Transport type (stdio, sse, http). Defaults to stdio if not specified.
+```
+
+例如：`claude mcp add -s user wanyi-watermark uvx wanyi-watermark`
+
+如果需要传入环境变量，例如API_KEY等：
+
+```
+claude mcp add "-e<ENV>=<value>" -s user <mcp_name> <command> <args>
+```
+
+例如：`claude mcp add "-eDASHSCOPE_API_KEY=sk-xxxx" -s user wanyi-watermark uvx wanyi-watermark`
+
+**注意**
+
+- 需要将`-exxx`的部分用引号包裹起来，否则会提示：`error: missing required argument 'name'`
+- `-e`后面与`<ENV>`之间不能有空格
+- 如果不添加`-s user`，则会将mcp安装到当前目录。
+
+#### 移除MCP
+
+```
+claude mcp remove <mcp_name>
 ```
 
 ### 使用注意事项
