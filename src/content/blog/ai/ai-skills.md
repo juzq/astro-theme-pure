@@ -9,7 +9,7 @@ tags:
 
 ## 什么是 Skill
 
-Skill（技能）是 Claude Code 的扩展能力模块，每个 skill 都是一个独立的功能单元，包含：
+Skill（技能）是 Claude Code及常用Agent的扩展能力模块，每个 skill 都是一个独立的功能单元，包含：
 
 - **触发条件**：定义何时可以使用该 skill
 - **工作流程**：预定义的处理步骤和检查清单
@@ -41,7 +41,7 @@ Skill 分为以下几种来源：
 
 不确定有哪些 skill 可用？输入 `/` 可以看到所有可用 skill 的列表。
 
-## 插件
+## 插件 Skill
 
 Claude 可以通过安装插件来使用更多 skill。
 
@@ -74,38 +74,32 @@ Claude 可以通过安装插件来使用更多 skill。
 
 > Claude 自带了官方的 marketplace：`claude-plugins-official`，无需再添加，可以直接安装其中的插件。
 
-## 自定义 Skill 配置
+## 自定义 Skill
 
 也可以将 skill 放入指定路径使用，适用于自定义插件。
 
-### 项目级配置
-
-| 工具 | 路径 |
-|------|------|
-| Claude 专用 | `.claude/skills/<name>/SKILL.md` |
-| 大部分 AI 工具通用 | `.agents/skills/<name>/SKILL.md` |
-| Opencode 专用 | `.opencode/skills/<name>/SKILL.md` |
-
-### 全局配置
-
-| 工具 | 路径 |
-|------|------|
-| Claude 专用 | `~/.config/opencode/skills/<name>/SKILL.md` |
-| 大部分 AI 工具通用 | `~/.claude/skills/<name>/SKILL.md` |
-| Opencode 专用 | `~/.agents/skills/<name>/SKILL.md` |
-
 注意：`<name>` 必须和 `SKILL.md` 中的 `name` **完全一致**。
 
-## 常用 Skills 推荐
+### Claude Code
 
-以下是一些常用的高价值 skill：
+Claude Code启动时，会读取`~/.claude/skills`和`.claude/skills`目录下的所有skill。安装skill时，默认是安装到`~/.agents/skills`下，为了claude code也能使用，可以创建符号链接。
 
-| Skill | 用途 |
-|-------|------|
-| `/pdf` | 读取、编辑、合并 PDF 文件 |
-| `/xlsx` | 读取和编辑 Excel 电子表格 |
-| `/pptx` | 创建和编辑 PowerPoint 演示文稿 |
-| `/docx` | 创建和编辑 Word 文档 |
-| `/web-artifacts` | 生成精美的 HTML 页面和组件 |
-| `/canvas-design` | 创建海报、艺术图形和 PDF 文档 |
-| `/slack-gif-creator` | 制作 Slack 优化的动画 GIF |
+#### macOS/Linux
+
+```
+ln -s ~/.agents/skills ~/.claude/skills
+```
+
+#### Windows
+
+```
+MSYS=winsymlinks:nativestrict ln -s /c/Users/<name>/.agents/skills /c/Users/<name>/.claude/skills
+```
+
+### find-skills
+
+从[skills.sh](https://skills.sh/)中查找skill并自动安装。
+
+```
+npx skills add https://github.com/vercel-labs/skills --skill find-skills
+```
