@@ -1,6 +1,7 @@
 import { copyToClipboard } from './clipboard'
 import { formatJSON, formatKotlinDataString, formatProtobufMessage, formatXML } from './formatters'
 import {
+  highlightCurrentBlock,
   performSearch,
   showHighlightAndScroll,
   syncScroll,
@@ -174,8 +175,13 @@ searchNextBtn?.addEventListener('click', () => {
   currentMatchIndex = (currentMatchIndex + 1) % allMatches.length
 })
 
-textInput.addEventListener('input', () => updateLineNumbers(lineNumbersEl, textInput))
+textInput.addEventListener('input', () => {
+  updateLineNumbers(lineNumbersEl, textInput)
+  highlightCurrentBlock(lineNumbersEl, textInput)
+})
 textInput.addEventListener('scroll', () => syncScroll(lineNumbersEl, textInput))
+textInput.addEventListener('click', () => highlightCurrentBlock(lineNumbersEl, textInput))
+textInput.addEventListener('keyup', () => highlightCurrentBlock(lineNumbersEl, textInput))
 
 const currentTimestampSeconds = document.getElementById('current-timestamp-seconds')
 const currentTimestampMilliseconds = document.getElementById('current-timestamp-milliseconds')
