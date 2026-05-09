@@ -41,6 +41,10 @@ const title = 'Tools'
               <input type='radio' name='format-type' value='xml' class='w-4 h-4' />
               <span>XML</span>
             </label>
+            <label class='flex items-center gap-2 cursor-pointer'>
+              <input type='radio' name='format-type' value='kotlin-data' class='w-4 h-4' />
+              <span>Kotlin Data</span>
+            </label>
           </div>
           <div class='flex gap-2 ml-auto'>
             <button
@@ -198,7 +202,7 @@ const title = 'Tools'
         searchInput.value = ''
         matchInfo.textContent = '0 / 0'
         allMatches = []
-        
+
         // 更新URL参数，添加tab参数
         const url = new URL(window.location.href)
         url.searchParams.set('tab', tabName as string)
@@ -285,6 +289,9 @@ const title = 'Tools'
             break
           case 'protobuf':
             formatProtobuf()
+            break
+          case 'kotlin-data':
+            formatKotlinData()
             break
           default:
             alert('请选择格式化类型')
@@ -443,6 +450,130 @@ const title = 'Tools'
       }
 
       return result.join('\n')
+    }
+
+    // Kotlin Data Class 格式化
+    function formatKotlinData() {
+      const text = textInput.value.trim()
+      if (!text) {
+        alert('请输入 Kotlin Data Class 内容')
+        return
+      }
+
+      try {
+        textInput.value = formatKotlinDataString(text)
+      } catch (error) {
+        alert('格式化失败：' + (error as Error).message)
+      }
+    }
+
+    // 从日志文本中提取 Kotlin Data Class 内容
+    function extractKotlinDataClass(text: string): string {
+      // 匹配 ClassName( 模式，ClassName 以大写字母开头
+      const match = text.match(/[A-Z][A-Za-z0-9_]*\(/)
+      if (!match || match.index === undefined) {
+        return text
+      }
+
+      const startIndex = match.index
+      const openParenIndex = startIndex + match[0].length - 1
+
+      // 从 ( 开始匹配对应的 )
+      let depth = 0
+      let endParenIndex = -1
+      for (let i = openParenIndex; i < text.length; i++) {
+        if (text[i] === '(') {
+          depth++
+        } else if (text[i] === ')') {
+          depth--
+          if (depth === 0) {
+            endParenIndex = i
+            break
+          }
+        }
+      }
+
+      if (endParenIndex === -1) {
+        return text
+      }
+
+      return text.substring(startIndex, endParenIndex + 1)
+    }
+
+    function formatKotlinDataString(text: string): string {
+      // 先提取 Kotlin Data Class 内容，去除前后多余文本
+      const extracted = extractKotlinDataClass(text)
+
+      const result: string[] = []
+      let i = 0
+      let indent = 0
+      const tab = '  '
+      let needIndent = false
+
+      while (i < extracted.length) {
+        const char = extracted[i]
+
+        if (char === '(') {
+          result.push(char)
+          result.push('\n')
+          indent++
+          needIndent = true
+          i++
+        } else if (char === ')') {
+          indent--
+          result.push('\n')
+          result.push(tab.repeat(indent) + char)
+          needIndent = false
+          i++
+        } else if (char === '[') {
+          result.push(char)
+          result.push('\n')
+          indent++
+          needIndent = true
+          i++
+        } else if (char === ']') {
+          indent--
+          result.push('\n')
+          result.push(tab.repeat(indent) + char)
+          needIndent = false
+          i++
+        } else if (char === ',') {
+          result.push(char)
+          result.push('\n')
+          needIndent = true
+          i++
+        } else if (char === ' ' || char === '\t' || char === '\n' || char === '\r') {
+          i++
+        } else {
+          let token = ''
+          while (i < extracted.length) {
+            const c = extracted[i]
+            if (
+              c === '(' ||
+              c === ')' ||
+              c === '[' ||
+              c === ']' ||
+              c === ',' ||
+              c === ' ' ||
+              c === '\t' ||
+              c === '\n' ||
+              c === '\r'
+            ) {
+              break
+            }
+            token += c
+            i++
+          }
+          if (needIndent) {
+            result.push(tab.repeat(indent) + token)
+            needIndent = false
+          } else {
+            result.push(token)
+          }
+        }
+      }
+
+      return result.join('')
     }
 
     // 搜索相关
