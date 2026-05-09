@@ -49,13 +49,13 @@ const title = 'Tools'
           <div class='flex gap-2 ml-auto'>
             <button
               id='format-btn'
-              class='px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm'
+              class='px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
             >
               格式化
             </button>
             <button
               id='clear-btn'
-              class='px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm'
+              class='px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
             >
               清空
             </button>
@@ -77,7 +77,7 @@ const title = 'Tools'
             <span id='match-info' class='text-sm text-muted-foreground'>0 / 0</span>
             <button
               id='search-next-btn'
-              class='px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm'
+              class='px-3 py-1 text-xs bg-gray-200 hover:bg-gray-300 rounded text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200'
             >
               下一个
             </button>
@@ -749,7 +749,8 @@ const title = 'Tools'
       const now = Date.now()
       const seconds = Math.floor(now / 1000)
       if (currentTimestampSeconds) currentTimestampSeconds.innerHTML = seconds.toString()
-      if (currentTimestampMilliseconds) currentTimestampMilliseconds.innerHTML = now.toString()
+      if (currentTimestampMilliseconds)
+        currentTimestampMilliseconds.innerHTML = (seconds * 1000).toString()
     }
 
     // 初始化当前时间
