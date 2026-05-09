@@ -53,50 +53,77 @@ export function formatProtobufMessage(text: string): string {
 
   const result: string[] = []
   let indent = 0
-  let currentLine = ''
+
+  const tokens = tokenizeProtobuf(protobufContent)
 
   let i = 0
-  while (i < protobufContent.length) {
-    const char = protobufContent[i]
+  while (i < tokens.length) {
+    const token = tokens[i]
 
-    if (char === ' ') {
-      if (currentLine) {
-        currentLine += ' '
-      }
-      i++
-    } else if (char === '{') {
-      if (currentLine) {
-        result.push('  '.repeat(indent) + currentLine.trim() + ' {')
-        currentLine = ''
-      } else {
-        result.push('  '.repeat(indent) + '{')
-      }
+    if (token === '{') {
       indent++
       i++
-    } else if (char === '}') {
-      if (currentLine) {
-        result.push('  '.repeat(indent) + currentLine.trim())
-        currentLine = ''
-      }
+    } else if (token === '}') {
       indent--
       result.push('  '.repeat(indent) + '}')
       i++
-    } else if (char === ';') {
-      currentLine += char
-      result.push('  '.repeat(indent) + currentLine.trim())
-      currentLine = ''
-      i++
+    } else if (i + 1 < tokens.length && tokens[i + 1] === '{') {
+      result.push('  '.repeat(indent) + token + ' {')
+      indent++
+      i += 2
     } else {
-      currentLine += char
+      result.push('  '.repeat(indent) + token)
       i++
     }
   }
 
-  if (currentLine.trim()) {
-    result.push('  '.repeat(indent) + currentLine.trim())
+  return result.join('\n')
+}
+
+function tokenizeProtobuf(text: string): string[] {
+  const tokens: string[] = []
+  let i = 0
+
+  while (i < text.length) {
+    const char = text[i]
+
+    if (char === ' ' || char === '\t' || char === '\n' || char === '\r') {
+      i++
+    } else if (char === '{' || char === '}') {
+      tokens.push(char)
+      i++
+    } else {
+      let token = ''
+      while (i < text.length) {
+        const c = text[i]
+        if (c === '{' || c === '}' || c === ' ' || c === '\t' || c === '\n' || c === '\r') {
+          break
+        }
+        token += c
+        i++
+      }
+
+      if (token.endsWith(':')) {
+        let value = ''
+        while (i < text.length && (text[i] === ' ' || text[i] === '\t')) {
+          i++
+        }
+        while (i < text.length) {
+          const c = text[i]
+          if (c === ' ' || c === '\t' || c === '\n' || c === '\r' || c === '{' || c === '}') {
+            break
+          }
+          value += c
+          i++
+        }
+        tokens.push(token + (value ? ' ' + value : ''))
+      } else {
+        tokens.push(token)
+      }
+    }
   }
 
-  return result.join('\n')
+  return tokens
 }
 
 export function extractKotlinDataClass(text: string): string {
@@ -176,17 +203,7 @@ export function formatKotlinDataString(text: string): string {
       let token = ''
       while (i < extracted.length) {
         const c = extracted[i]
-        if (
-          c === '(' ||
-          c === ')' ||
-          c === '[' ||
-          c === ']' ||
-          c === ',' ||
-          c === ' ' ||
-          c === '\t' ||
-          c === '\n' ||
-          c === '\r'
-        ) {
+        if (c === '(' || c === ')' || c === '[' || c === ']' || c === ',' || c === ' ' || c === '\t' || c === '\n' || c === '\r') {
           break
         }
         token += c
