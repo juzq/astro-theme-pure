@@ -255,6 +255,7 @@ const title = 'Tools'
         textInput.value = ''
         searchInput.value = ''
         matchInfo.textContent = '0 / 0'
+        updateLineNumbers()
       })
     })
 
@@ -597,6 +598,10 @@ const title = 'Tools'
         if (!allMatches || allMatches.length === 0) {
           performSearch()
         }
+        // 没有匹配项时不执行高亮
+        if (!allMatches || allMatches.length === 0) {
+          return
+        }
         // 显示当前匹配项（从第一个开始）
         showHighlightAndScroll()
         // 更新显示
@@ -611,6 +616,10 @@ const title = 'Tools'
       // 如果还没有匹配项，先执行搜索
       if (!allMatches || allMatches.length === 0) {
         performSearch()
+      }
+      // 没有匹配项时不执行高亮
+      if (!allMatches || allMatches.length === 0) {
+        return
       }
       // 显示当前匹配项
       showHighlightAndScroll()
@@ -663,7 +672,7 @@ const title = 'Tools'
       }
 
       // 找到匹配项的位置，使用非全局正则表达式避免lastIndex问题
-      const regex = new RegExp(searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
+      const regex = new RegExp(searchPattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')
       regex.lastIndex = 0 // 重置lastIndex
 
       let match
