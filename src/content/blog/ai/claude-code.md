@@ -59,6 +59,15 @@ claude --version
 
 ### 基本使用
 
+#### 常用配置
+
+`~/.claude/settings.json`
+
+##### 关闭自动更新
+```
+"DISABLE_AUTOUPDATER": "1"
+```
+
 #### 启动对话
 
 ```
