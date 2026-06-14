@@ -7,7 +7,7 @@ tags:
   - Skills
 ---
 
-## 什么是 Skill
+### 什么是 Skill
 
 Skill（技能）是 Claude Code及常用Agent的扩展能力模块，每个 skill 都是一个独立的功能单元，包含：
 
@@ -21,9 +21,9 @@ Skill 分为以下几种来源：
 - **插件 skill**：通过插件安装的第三方扩展
 - **自定义 skill**：通过拷贝skill文件夹到指定目录
 
-## 使用 Skill
+### 使用 Skill
 
-### 调用方式
+#### 调用方式
 
 在 Claude Code 中，使用斜杠命令调用 skill：
 
@@ -37,21 +37,21 @@ Skill 分为以下几种来源：
 - `/pdf document.pdf 提取第三章内容`
 - `/pptx 创建一个关于AI的演示文稿`
 
-### Skill 查找
+#### Skill 查找
 
 不确定有哪些 skill 可用？输入 `/` 可以看到所有可用 skill 的列表。
 
-## 插件 Skill
+### 插件 Skill
 
 Claude 可以通过安装插件来使用更多 skill。
 
-### 1. 添加 marketplace
+#### 添加 marketplace
 
 ```
 /plugin marketplace add obra/superpowers-marketplace
 ```
 
-### 2. 安装插件
+#### 安装插件
 
 **方式一：命令安装**
 
@@ -66,40 +66,80 @@ Claude 可以通过安装插件来使用更多 skill。
 3. 选择市场后，再选择 `Browse plugins`
 4. 按空格勾选插件，再按 `i` 键安装
 
-### 3. 重载插件
+#### 重载插件
 
 安装后使用命令 `/reload-plugins` 重载，或重新打开 Claude 即可使用插件。
 
 > 注意：要使用插件中的 skill，**必须退出 Claude 并重新进入**。
 
-> Claude 自带了官方的 marketplace：`claude-plugins-official`，无需再添加，可以直接安装其中的插件。
-
-## 自定义 Skill
+### 自定义 Skill
 
 也可以将 skill 放入指定路径使用，适用于自定义插件。
 
 注意：`<name>` 必须和 `SKILL.md` 中的 `name` **完全一致**。
 
-### Claude Code
+#### Claude Code
 
 Claude Code启动时，会读取`~/.claude/skills`和`.claude/skills`目录下的所有skill。安装skill时，默认是安装到`~/.agents/skills`下，为了claude code也能使用，可以创建符号链接。
 
-#### macOS/Linux
+##### macOS/Linux
 
 ```
 ln -s ~/.agents/skills ~/.claude/skills
 ```
 
-#### Windows
+##### Windows
 
 ```
 MSYS=winsymlinks:nativestrict ln -s /c/Users/<name>/.agents/skills /c/Users/<name>/.claude/skills
 ```
 
-### find-skills
+### 常用skill
+
+#### find-skills
 
 从[skills.sh](https://skills.sh/)中查找skill并自动安装。
 
 ```
 npx skills add https://github.com/vercel-labs/skills --skill find-skills
+```
+
+#### skill-creator
+
+创造自定义技能
+
+```
+npx skills add https://github.com/anthropics/skills --skill skill-creator
+```
+
+#### superpowers
+
+全能开发：项目规划、代码编写、code review 等，拆解做产品的开发步骤。
+
+```
+/plugin marketplace add obra/superpowers-marketplace
+```
+
+#### frontend-design
+
+前端设计
+
+```
+npx skills add https://github.com/anthropics/skills --skill frontend-design
+```
+
+#### backend-development
+
+后端开发
+
+```
+npx skills add https://github.com/mrgoonie/claudekit-skills --skill backend-development
+```
+
+#### playwright-cli
+
+浏览器自动化操作
+
+```
+npx skills add https://github.com/microsoft/playwright-cli --skill playwright-cli
 ```

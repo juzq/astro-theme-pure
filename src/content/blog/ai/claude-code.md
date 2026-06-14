@@ -9,13 +9,15 @@ tags:
 
 ### 安装
 
+#### Node方式安装
+
 前置条件：安装 [Node.js](https://nodejs.org/en/download)
 
 ```
 npm install -g @anthropic-ai/claude-code
 ```
 
-注意：如无国外网络，macOS或Linux则不能使用`curl -fsSL https://claude.ai/install.sh | bash`来安装。
+注意：Windows下安装后npm是以npm.cmd的形式存在的，Powershell中无法直接运行，在CMD中运行即可。
 
 验证安装
 
@@ -64,6 +66,7 @@ claude --version
 `~/.claude/settings.json`
 
 ##### 关闭自动更新
+
 ```
 "DISABLE_AUTOUPDATER": "1"
 ```
