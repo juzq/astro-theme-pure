@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a personal blog built with [Astro](https://astro.build/) using the `astro-theme-pure` theme. The site features blog posts, documentation pages, tools, and about pages.
+This is a personal blog built with [Astro](https://astro.build/) using the `astro-theme-pure` theme. The site features blog posts, documentation pages, and about pages. The "Tools" item in the header menu is an external link to `https://utils.qzz.io/` (configured in `src/site.config.ts`), not a local page.
 
 ## Common Commands
 
@@ -45,11 +45,11 @@ pnpm sync
 
 ### Key Directories
 
-- **`src/pages/`** - Astro pages (404, about, tools, etc.)
+- **`src/pages/`** - Astro pages (404, about, archives, etc.)
 - **`src/layouts/`** - Page layouts (BaseLayout, BlogPost, ContentLayout)
 - **`src/components/`** - Astro components (home, links, projects, waline, about)
 - **`src/plugins/`** - Custom Shiki transformers and rehype plugins
-- **`packages/pure/`** - Reusable theme components and utilities published as `astro-pure` npm package
+- **`packages/pure/`** - Reusable theme components and utilities published as `astro-pure` npm package. `Header.astro` auto-detects absolute URLs in `header.menu` and opens them with `target="_blank"` + `rel="noopener noreferrer"` (via `isAbsoluteUrl`).
 - **`preset/`** - Preset configurations (avatars caching scripts)
 
 ### Configuration Files

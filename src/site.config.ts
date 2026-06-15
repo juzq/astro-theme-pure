@@ -49,7 +49,7 @@ export const theme: ThemeUserConfig = {
   header: {
     menu: [
       { title: 'Blog', link: '/blog' },
-      { title: 'Tools', link: '/tools' },
+      { title: 'Tools', link: 'https://utils.qzz.io/' },
       // { title: 'Docs', link: '/docs' },
       // { title: 'Projects', link: '/projects' },
       // { title: 'Links', link: '/links' },
