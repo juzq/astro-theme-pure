@@ -25,10 +25,10 @@ const text = rawText.endsWith('#') ? rawText.slice(0, -1) : rawText
         depth === 3 && 'ps-5',
         depth === 4 && 'ps-9',
         depth >= 5 && 'ps-13',
-        depth === 2 && 'text-xl',
-        depth === 3 && 'text-lg',
+        depth === 2 && 'text-[18px]',
+        depth === 3 && 'text-[17px]',
         depth === 4 && 'text-base',
-        depth >= 5 && 'text-sm'
+        depth >= 5 && 'text-[15px]'
       )}
       href={`#${slug}`}>{text}</a
     >
