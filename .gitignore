@@ -5,6 +5,9 @@ dist/
 ### Vercel ###
 .vercel/
 
+### Test artifacts (transient; deleted after testing) ###
+tmp/
+
 ### Vim ###
 [._]*.un~
 

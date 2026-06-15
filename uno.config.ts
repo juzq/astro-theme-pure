@@ -37,6 +37,12 @@ const typographyConfig: TypographyOptions = {
     'h2,h3,h4,h5,h6': {
       'scroll-margin-top': '4rem'
     },
+    h2: { 'font-size': '1.875em', 'font-weight': '600' },
+    h3: { 'font-size': '1.5em', 'font-weight': '600' },
+    h4: { 'font-size': '1.25em', 'font-weight': '600' },
+    h5: { 'font-size': '1em', 'font-weight': '600', color: fg },
+    h6: { color: fg },
+    strong: { 'font-weight': '500' },
     'h1>a,h2>a,h3>a,h4>a,h5>a,h6>a': {
       'margin-inline-start': '0.75rem',
       color: fgMuted,

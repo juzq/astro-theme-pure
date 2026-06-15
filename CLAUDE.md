@@ -66,3 +66,7 @@ pnpm sync
 - **UnoCSS** for utility CSS
 - **Pagefind** for full-text search
 - **KaTeX** for math rendering (via remark-math/rehype-katex)
+
+### Test Artifacts
+
+Test scripts and verification screenshots go in **`tmp/`** (gitignored). Delete the files once testing is done — do not leave litter in the project.
