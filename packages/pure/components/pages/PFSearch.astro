@@ -96,11 +96,15 @@ import '@pagefind/default-ui/css/ui.css'
 
           // Convert filter checkboxes to radio buttons for single-select tag
           // switching, and let the user deselect by clicking the active radio a
-          // second time (HTML radios don't auto-deselect on re-click). The
-          // click handler works for clicks on both the input itself and the
-          // associated <label>: at the moment the click event reaches the
-          // input, `el.checked` is still the pre-click value, so seeing `true`
-          // unambiguously means "this radio is already selected — deselect it".
+          // second time. We need two paths because of how the browser forwards
+          // label clicks:
+          //   1. Direct input click: mousedown fires on the input and we can
+          //      record pre-click `checked` state in `dataset.wasChecked`.
+          //      The click handler then deselects when `wasChecked` was true.
+          //   2. Label click: the browser forwards the click to the input, but
+          //      no mousedown ever lands on the input — so `wasChecked` is
+          //      stale or undefined. We bind a separate click handler on the
+          //      label that uses the live `el.checked` value instead.
           // HTML radios only emit `change` on the newly-checked one, so we
           // dispatch `change` on the previously-checked siblings to keep
           // PagefindUI's `selected_filters` in sync (otherwise stale `true`
@@ -113,12 +117,31 @@ import '@pagefind/default-ui/css/ui.css'
                 el.type = 'radio'
                 el.dataset.radioConverted = 'true'
 
+                // Direct click on the input: mousedown captures pre-click state.
+                el.addEventListener('mousedown', () => {
+                  el.dataset.wasChecked = String(el.checked)
+                })
                 el.addEventListener('click', (e) => {
-                  if (!el.checked) return
+                  if (el.dataset.wasChecked !== 'true') return
                   e.preventDefault()
                   el.checked = false
                   el.dispatchEvent(new Event('change'))
                 })
+
+                // Click on the associated <label>: handle deselect here too,
+                // since the input's mousedown never fires for label clicks.
+                const label = el.parentElement?.querySelector<HTMLLabelElement>(
+                  '.pagefind-ui__filter-label'
+                )
+                if (label && !label.dataset.labelClickBound) {
+                  label.dataset.labelClickBound = 'true'
+                  label.addEventListener('click', (e) => {
+                    if (!el.checked) return
+                    e.preventDefault()
+                    el.checked = false
+                    el.dispatchEvent(new Event('change'))
+                  })
+                }
 
                 el.addEventListener('change', () => {
                   if (el.checked) {
