@@ -37,6 +37,8 @@ import '@pagefind/default-ui/css/ui.css'
             bundlePath: `${import.meta.env.BASE_URL.replace(/\/$/, '')}/pagefind/`,
             showImages: false,
             showSubResults: true,
+            showEmptyFilters: false,
+            openFilters: ['tag'],
             processResult: (result: { url: string; sub_results: Array<{ url: string }> }) => {
               result.url = formatURL(result.url)
               result.sub_results = result.sub_results.map((sub_result) => {
@@ -45,26 +47,6 @@ import '@pagefind/default-ui/css/ui.css'
               })
             }
           })
-          // Hide filter values whose count is (0)
-          const hideEmptyFilters = () => {
-            document
-              .querySelectorAll<HTMLElement>('.pagefind-ui__filter-value')
-              .forEach((el) => {
-                const count = el.querySelector('.pagefind-ui__filter-count')
-                if (!count) return
-                const text = count.textContent?.trim() ?? ''
-                el.style.display = text === '(0)' ? 'none' : ''
-              })
-          }
-          const filterBlock = document.querySelector('.pagefind-ui__filter-block')
-          if (filterBlock) {
-            hideEmptyFilters()
-            new MutationObserver(hideEmptyFilters).observe(filterBlock, {
-              childList: true,
-              subtree: true,
-              characterData: true
-            })
-          }
         })
       })
     }
