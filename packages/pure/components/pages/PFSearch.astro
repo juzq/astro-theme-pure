@@ -46,51 +46,82 @@ import '@pagefind/default-ui/css/ui.css'
               })
             }
           })
-          // Extract the count from each value's label text ("ai (5)" → 5) and stash it
-          // on the value element as a `data-count` attribute so CSS can hide 0-count
-          // items by default, and show them again when a tag is actively selected.
-          const setDataCount = () => {
-            document
-              .querySelectorAll('.pagefind-ui__filter-group')
-              .forEach((filterGroup) => {
-                filterGroup
-                  .querySelectorAll<HTMLElement>('.pagefind-ui__filter-value')
-                  .forEach((valueEl) => {
-                    if (valueEl.dataset.allOption !== undefined) {
-                      valueEl.dataset.count = String(Number.MAX_SAFE_INTEGER)
-                      return
-                    }
-                    const label = valueEl.querySelector('.pagefind-ui__filter-label')
-                    if (!label) return
-                    const match = label.textContent?.match(/\((\d+)\)/)
-                    valueEl.dataset.count = match ? match[1] : '0'
-                  })
-              })
+
+          // Track the last seen search query so we can re-record the "stable" tag
+          // count when the user types something new. The stable count is the
+          // per-tag result count under the current query *without* any tag filter
+          // applied — Pagefind's UI re-renders this on tag selection (it shows
+          // "if you switched to this tag, you'd get N results") which we don't
+          // want. We cache the query-only version and overwrite Pagefind's
+          // recomputed label.
+          let lastQuery = ''
+          const getCurrentQuery = () =>
+            (document.querySelector<HTMLInputElement>('.pagefind-ui__search-input')?.value ?? '')
+
+          // Read each value's count from its label ("ai (5)" → 5), then either
+          // (a) cache it as the new stable count when the query changes (or no
+          // tag is currently selected), or (b) overwrite Pagefind's recomputed
+          // count with the cached stable count when a tag is selected. The
+          // stable count is mirrored to `data-count` so CSS can hide 0-count
+          // tags by default.
+          const setStableCount = (isNewQuery: boolean) => {
+            document.querySelectorAll('.pagefind-ui__filter-group').forEach((filterGroup) => {
+              const anyTagChecked =
+                filterGroup.querySelector<HTMLInputElement>('input[type="radio"]:checked') !== null
+
+              filterGroup
+                .querySelectorAll<HTMLElement>('.pagefind-ui__filter-value')
+                .forEach((valueEl) => {
+                  if (valueEl.dataset.allOption !== undefined) {
+                    valueEl.dataset.count = String(Number.MAX_SAFE_INTEGER)
+                    return
+                  }
+                  const label = valueEl.querySelector<HTMLElement>('.pagefind-ui__filter-label')
+                  if (!label) return
+                  const match = label.textContent?.match(/\((\d+)\)/)
+                  if (!match) return
+                  const currentCount = match[1]
+
+                  if (isNewQuery || !anyTagChecked) {
+                    valueEl.dataset.originalCount = currentCount
+                  }
+
+                  const originalCount = valueEl.dataset.originalCount ?? currentCount
+                  if (originalCount !== currentCount) {
+                    label.textContent = label.textContent.replace(
+                      `(${currentCount})`,
+                      `(${originalCount})`
+                    )
+                  }
+                  valueEl.dataset.count = originalCount
+                })
+            })
           }
-          // Toggle `.show-all-tags` on the filter group whenever any non-"All" radio
-          // is currently checked — CSS then reveals the 0-count tags so the user can
-          // jump between tags without losing visibility of alternatives.
+
+          // Toggle `.show-all-tags` on each filter group based on whether any
+          // real tag radio is currently checked. CSS uses this to reveal
+          // 0-count tags once a tag is actively selected, so the user can
+          // pivot to another tag without first deselecting.
           const updateShowAllTags = () => {
             document
               .querySelectorAll('.pagefind-ui__filter-group')
               .forEach((filterGroup) => {
-                const firstRadio = filterGroup.querySelector<HTMLInputElement>(
-                  'input[type="radio"]'
-                )
+                const firstRadio = filterGroup.querySelector<HTMLInputElement>('input[type="radio"]')
                 if (!firstRadio) return
                 const filterName = firstRadio.name
                 const anyTagSelected = Array.from(
-                  filterGroup.querySelectorAll<HTMLInputElement>(
-                    `input[name="${filterName}"]`
-                  )
+                  filterGroup.querySelectorAll<HTMLInputElement>(`input[name="${filterName}"]`)
                 ).some((radio) => radio.checked)
                 filterGroup.classList.toggle('show-all-tags', anyTagSelected)
               })
           }
-          // Convert filter checkboxes to radio buttons for single-select tag switching.
-          // HTML radios only emit `change` on the newly-checked one, so we dispatch
-          // `change` on the previously-checked siblings to keep PagefindUI's
-          // `selected_filters` in sync (otherwise stale `true` entries remain).
+
+          // Convert filter checkboxes to radio buttons for single-select tag
+          // switching, and let the user deselect by clicking the active radio a
+          // second time. HTML radios only emit `change` on the newly-checked
+          // one, so we dispatch `change` on the previously-checked siblings to
+          // keep PagefindUI's `selected_filters` in sync (otherwise stale
+          // `true` entries remain and zero out results).
           const toRadio = () => {
             document
               .querySelectorAll<HTMLInputElement>('.pagefind-ui__filter-checkbox')
@@ -98,40 +129,61 @@ import '@pagefind/default-ui/css/ui.css'
                 if (el.type === 'radio' || el.dataset.radioConverted) return
                 el.type = 'radio'
                 el.dataset.radioConverted = 'true'
+
+                // Record pre-click state so we can distinguish "clicking an
+                // unchecked radio to select it" from "clicking the already-
+                // checked radio to deselect it" (HTML radios don't auto-
+                // deselect on re-click, so we have to fake it).
+                el.addEventListener('mousedown', () => {
+                  el.dataset.wasChecked = String(el.checked)
+                })
+                el.addEventListener('click', (e) => {
+                  if (el.dataset.wasChecked === 'true') {
+                    e.preventDefault()
+                    el.checked = false
+                    el.dispatchEvent(new Event('change'))
+                  }
+                })
+
                 el.addEventListener('change', () => {
-                  if (!el.checked) return
-                  document
-                    .querySelectorAll<HTMLInputElement>(`input[name="${el.name}"]`)
-                    .forEach((other) => {
-                      if (other !== el && other.checked) {
-                        other.checked = false
-                        other.dispatchEvent(new Event('change'))
-                      }
-                    })
-                  // Tag selected: drop the "All" checked styling and reveal 0-count tags
                   const filterGroup = el.closest('.pagefind-ui__filter-group')
                   const allOption = filterGroup?.querySelector('[data-all-option]')
-                  allOption?.classList.remove('pagefind-ui__filter-value--checked')
-                  filterGroup?.classList.add('show-all-tags')
+
+                  if (!el.checked) {
+                    // Tag deselected: restore the "All" pill's checked styling.
+                    allOption?.classList.add('pagefind-ui__filter-value--checked')
+                  } else {
+                    // Tag selected: clear siblings and drop the "All" styling.
+                    document
+                      .querySelectorAll<HTMLInputElement>(`input[name="${el.name}"]`)
+                      .forEach((other) => {
+                        if (other !== el && other.checked) {
+                          other.checked = false
+                          other.dispatchEvent(new Event('change'))
+                        }
+                      })
+                    allOption?.classList.remove('pagefind-ui__filter-value--checked')
+                  }
+                  // Refresh visibility + stable count after every state change.
+                  updateShowAllTags()
+                  setStableCount(false)
                 })
               })
           }
-          // Inject a clickable "All" pill at the top of every filter group. It's a
-          // plain <div> (not a real radio) so clicking it doesn't add a `__all__`
-          // entry to PagefindUI's `selected_filters` — we just clear the actual tag
-          // radios via the same dispatch trick, then refresh the visual state.
+
+          // Inject a clickable "All" pill at the top of every filter group. It's
+          // a plain <div> (not a real radio) so clicking it doesn't add a
+          // `__all__` entry to PagefindUI's `selected_filters` — we just clear
+          // the actual tag radios via the same dispatch trick, then refresh
+          // the visual state.
           const addAllOption = () => {
             document.querySelectorAll('.pagefind-ui__filter-group').forEach((filterGroup) => {
               if (filterGroup.querySelector('[data-all-option]')) return
-              const firstRadio = filterGroup.querySelector<HTMLInputElement>(
-                'input[type="radio"]'
-              )
+              const firstRadio = filterGroup.querySelector<HTMLInputElement>('input[type="radio"]')
               if (!firstRadio) return
               const filterName = firstRadio.name
               const hasSelectedTag = Array.from(
-                filterGroup.querySelectorAll<HTMLInputElement>(
-                  `input[name="${filterName}"]`
-                )
+                filterGroup.querySelectorAll<HTMLInputElement>(`input[name="${filterName}"]`)
               ).some((radio) => radio.checked)
 
               const container = document.createElement('div')
@@ -145,7 +197,7 @@ import '@pagefind/default-ui/css/ui.css'
               }
 
               container.addEventListener('click', () => {
-                // Uncheck all real tag radios (skip the fake "All" div)
+                // Uncheck all real tag radios (skip the fake "All" div).
                 document
                   .querySelectorAll<HTMLInputElement>(`input[name="${filterName}"]`)
                   .forEach((other) => {
@@ -154,16 +206,20 @@ import '@pagefind/default-ui/css/ui.css'
                       other.dispatchEvent(new Event('change'))
                     }
                   })
-                // Restore the "All" visual state and hide 0-count tags again
+                // Restore the "All" visual state and re-hide 0-count tags.
                 container.classList.add('pagefind-ui__filter-value--checked')
                 filterGroup.classList.remove('show-all-tags')
+                setStableCount(false)
               })
             })
           }
+
           const setupFilters = () => {
             toRadio()
             addAllOption()
-            setDataCount()
+            const isNewQuery = getCurrentQuery() !== lastQuery
+            lastQuery = getCurrentQuery()
+            setStableCount(isNewQuery)
             updateShowAllTags()
           }
           const siteSearch = document.querySelector('#site-search')
@@ -181,7 +237,7 @@ import '@pagefind/default-ui/css/ui.css'
   customElements.define('site-search', SiteSearch)
 </script>
 
-<style>
+<style is:global>
   #site-search {
     --pagefind-ui-scale: 0.8;
     --pagefind-ui-primary: hsl(var(--primary) / var(--un-bg-opacity, 1));
@@ -196,8 +252,11 @@ import '@pagefind/default-ui/css/ui.css'
     --pagefind-ui-font: sans-serif;
   }
 
-  /* Hide 0-count tag values by default; reveal them when a tag is actively selected
-     so users can pivot between tags without losing visibility of alternatives. */
+  /* Hide 0-count tag values by default; reveal them when a tag is actively
+     selected so users can pivot between tags without losing visibility of
+     alternatives. The PagefindUI child DOM is injected at runtime and lacks
+     Astro's scoped `data-astro-cid-xxx` attribute, so the entire style block
+     is marked `is:global`. */
   #site-search .pagefind-ui__filter-value[data-count='0']:not([data-all-option]) {
     display: none;
   }
@@ -205,3 +264,5 @@ import '@pagefind/default-ui/css/ui.css'
     display: flex;
   }
 </style>
+</content>
+</invoke>
