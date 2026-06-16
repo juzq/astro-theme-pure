@@ -47,6 +47,98 @@ import '@pagefind/default-ui/css/ui.css'
               })
             }
           })
+          // Convert filter checkboxes to radio buttons for single-select tag switching.
+          // HTML radios only emit `change` on the newly-checked one, so we dispatch
+          // `change` on the previously-checked siblings to keep PagefindUI's
+          // `selected_filters` in sync (otherwise stale `true` entries remain).
+          const toRadio = () => {
+            document
+              .querySelectorAll<HTMLInputElement>('.pagefind-ui__filter-checkbox')
+              .forEach((el) => {
+                if (el.type === 'radio' || el.dataset.radioConverted) return
+                el.type = 'radio'
+                el.dataset.radioConverted = 'true'
+                el.addEventListener('change', () => {
+                  if (!el.checked) return
+                  document
+                    .querySelectorAll<HTMLInputElement>(`input[name="${el.name}"]`)
+                    .forEach((other) => {
+                      if (other !== el && other.checked) {
+                        other.checked = false
+                        other.dispatchEvent(new Event('change'))
+                      }
+                    })
+                  // Tag selected: drop the "All" checked styling
+                  const filterGroup = el.closest('.pagefind-ui__filter-group')
+                  const allOption = filterGroup?.querySelector('[data-all-option]')
+                  allOption?.classList.remove('pagefind-ui__filter-value--checked')
+                })
+              })
+          }
+          // Inject an "All" option at the top of every filter group, default checked.
+          // Clicking it: clears siblings via the same dispatch trick, then immediately
+          // un-checks itself so PagefindUI's `selected_filters` stays empty (otherwise
+          // a `tag:['__all__']` filter would match nothing and zero out results).
+          // We re-add `--checked` styling manually so it still looks selected.
+          const addAllOption = () => {
+            document.querySelectorAll('.pagefind-ui__filter-group').forEach((filterGroup) => {
+              if (filterGroup.querySelector('[data-all-option]')) return
+              const firstRadio = filterGroup.querySelector<HTMLInputElement>(
+                'input[type="radio"]'
+              )
+              if (!firstRadio) return
+              const filterName = firstRadio.name
+              const hasSelectedTag = Array.from(
+                filterGroup.querySelectorAll<HTMLInputElement>(
+                  `input[name="${filterName}"]`
+                )
+              ).some((radio) => radio.value !== '__all__' && radio.checked)
+
+              const container = document.createElement('div')
+              container.className = 'pagefind-ui__filter-value'
+              container.dataset.allOption = 'true'
+              container.innerHTML = `<input type="radio" name="${filterName}" value="__all__" id="${filterName}-__all__" ${
+                hasSelectedTag ? '' : 'checked'
+              }><label class="pagefind-ui__filter-label" for="${filterName}-__all__">All</label>`
+              filterGroup.insertBefore(container, filterGroup.firstChild)
+
+              const allRadio = container.querySelector<HTMLInputElement>('input')!
+              allRadio.dataset.radioConverted = 'true'
+              if (!hasSelectedTag) {
+                container.classList.add('pagefind-ui__filter-value--checked')
+              }
+
+              allRadio.addEventListener('change', () => {
+                if (!allRadio.checked) return
+                // Uncheck all other radios (including sibling tags)
+                document
+                  .querySelectorAll<HTMLInputElement>(`input[name="${filterName}"]`)
+                  .forEach((other) => {
+                    if (other !== allRadio && other.checked) {
+                      other.checked = false
+                      other.dispatchEvent(new Event('change'))
+                    }
+                  })
+                // Uncheck self so `selected_filters` never holds `tag:__all__: true`
+                allRadio.checked = false
+                allRadio.dispatchEvent(new Event('change'))
+                // Keep the "All" visual state via the value-container class
+                container.classList.add('pagefind-ui__filter-value--checked')
+              })
+            })
+          }
+          const setupFilters = () => {
+            toRadio()
+            addAllOption()
+          }
+          const siteSearch = document.querySelector('#site-search')
+          if (siteSearch) {
+            setupFilters()
+            new MutationObserver(setupFilters).observe(siteSearch, {
+              childList: true,
+              subtree: true
+            })
+          }
         })
       })
     }
