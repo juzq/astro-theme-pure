@@ -63,7 +63,7 @@ import '@pagefind/default-ui/css/ui.css'
           // tag is currently selected), or (b) overwrite Pagefind's recomputed
           // count with the cached stable count when a tag is selected. The
           // stable count is mirrored to `data-count` so CSS can hide 0-count
-          // tags by default.
+          // tags.
           const setStableCount = (isNewQuery: boolean) => {
             document.querySelectorAll('.pagefind-ui__filter-group').forEach((filterGroup) => {
               const anyTagChecked =
@@ -96,24 +96,6 @@ import '@pagefind/default-ui/css/ui.css'
                   valueEl.dataset.count = originalCount
                 })
             })
-          }
-
-          // Toggle `.show-all-tags` on each filter group based on whether any
-          // real tag radio is currently checked. CSS uses this to reveal
-          // 0-count tags once a tag is actively selected, so the user can
-          // pivot to another tag without first deselecting.
-          const updateShowAllTags = () => {
-            document
-              .querySelectorAll('.pagefind-ui__filter-group')
-              .forEach((filterGroup) => {
-                const firstRadio = filterGroup.querySelector<HTMLInputElement>('input[type="radio"]')
-                if (!firstRadio) return
-                const filterName = firstRadio.name
-                const anyTagSelected = Array.from(
-                  filterGroup.querySelectorAll<HTMLInputElement>(`input[name="${filterName}"]`)
-                ).some((radio) => radio.checked)
-                filterGroup.classList.toggle('show-all-tags', anyTagSelected)
-              })
           }
 
           // Convert filter checkboxes to radio buttons for single-select tag
@@ -164,8 +146,7 @@ import '@pagefind/default-ui/css/ui.css'
                       })
                     allOption?.classList.remove('pagefind-ui__filter-value--checked')
                   }
-                  // Refresh visibility + stable count after every state change.
-                  updateShowAllTags()
+                  // Re-record stable count under the new selected/cleared state.
                   setStableCount(false)
                 })
               })
@@ -206,9 +187,8 @@ import '@pagefind/default-ui/css/ui.css'
                       other.dispatchEvent(new Event('change'))
                     }
                   })
-                // Restore the "All" visual state and re-hide 0-count tags.
+                // Restore the "All" visual state.
                 container.classList.add('pagefind-ui__filter-value--checked')
-                filterGroup.classList.remove('show-all-tags')
                 setStableCount(false)
               })
             })
@@ -220,7 +200,6 @@ import '@pagefind/default-ui/css/ui.css'
             const isNewQuery = getCurrentQuery() !== lastQuery
             lastQuery = getCurrentQuery()
             setStableCount(isNewQuery)
-            updateShowAllTags()
           }
           const siteSearch = document.querySelector('#site-search')
           if (siteSearch) {
@@ -252,16 +231,11 @@ import '@pagefind/default-ui/css/ui.css'
     --pagefind-ui-font: sans-serif;
   }
 
-  /* Hide 0-count tag values by default; reveal them when a tag is actively
-     selected so users can pivot between tags without losing visibility of
-     alternatives. The PagefindUI child DOM is injected at runtime and lacks
-     Astro's scoped `data-astro-cid-xxx` attribute, so the entire style block
-     is marked `is:global`. */
+  /* Always hide 0-count tag values. The PagefindUI child DOM is injected at
+     runtime and lacks Astro's scoped `data-astro-cid-xxx` attribute, so the
+     entire style block is marked `is:global`. */
   #site-search .pagefind-ui__filter-value[data-count='0']:not([data-all-option]) {
     display: none;
-  }
-  #site-search .pagefind-ui__filter-group.show-all-tags .pagefind-ui__filter-value[data-count='0']:not([data-all-option]) {
-    display: flex;
   }
 </style>
 </content>
