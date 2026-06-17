@@ -92,20 +92,6 @@ claude --dangerously-skip-permissions # 跳过危险权限确认
 /exit      # 退出会话
 ```
 
-#### 模式切换
-
-```
-/browse    # 启用浏览模式，让AI主动浏览网页
-/eval      # 单行评估模式
-/improve   # 改进模式，针对当前选中内容
-```
-
-#### 管道操作
-
-```
-cat file.txt | claude "解释这段代码"
-```
-
 #### 指定文件
 
 ```
@@ -114,39 +100,3 @@ cat file.txt | claude "解释这段代码"
 
 可以直接告诉 AI 要操作哪个文件，更加高效。
 
-### 常见问题
-
-#### Q: 提示 "Permission denied"
-
-**A:** 检查 `~/.claude` 目录权限，确保当前用户有读写权限：
-
-```
-chmod 755 ~/.claude
-```
-
-#### Q: 第三方模型调用失败
-
-**A:**
-
-1. 确认 API Key 有效且未过期
-2. 检查 `ANTHROPIC_BASE_URL` 是否正确（有些需要完整的 v1 路径）
-3. 确认模型名称是否与提供商支持的一致
-
-#### Q: 上下文窗口满了
-
-**A:** 使用 `/compact` 命令压缩上下文，或开启新会话继续工作。
-
-#### Q: 网络连接问题
-
-**A:**
-
-- 确认环境变量 `HTTP_PROXY` / `HTTPS_PROXY` 已正确设置
-- 第三方模型确保 `ANTHROPIC_BASE_URL` 可达
-
-#### Q: 如何让AI不使用某个工具？
-
-**A:** 使用 `/no<tool>` 命令，例如 `/nobrowse` 禁用浏览模式。
-
-#### Q: 想查看更多调试信息？
-
-**A:** 设置环境变量 `CLAUDE_DEBUG=1` 可以看到详细日志。

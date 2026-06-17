@@ -96,12 +96,50 @@ MSYS=winsymlinks:nativestrict ln -s /c/Users/<name>/.agents/skills /c/Users/<nam
 
 ### 常用skill
 
+#### backend-development
+
+后端开发
+
+```
+npx skills add https://github.com/mrgoonie/claudekit-skills --skill backend-development
+```
+
+#### claude-hud
+
+在命令行显示模型、上下文、步骤、token等信息
+
+```
+/plugin marketplace add jarrodwatts/claude-hud
+```
+
+- Minimax用量查询：
+  ```
+  curl --location 'https://www.minimaxi.com/v1/token_plan/remains' \
+  --header 'Authorization: Bearer <API Key>' \
+  --header 'Content-Type: application/json'
+  ```
 #### find-skills
 
 从[skills.sh](https://skills.sh/)中查找skill并自动安装。
 
 ```
 npx skills add https://github.com/vercel-labs/skills --skill find-skills
+```
+
+#### frontend-design
+
+前端设计
+
+```
+npx skills add https://github.com/anthropics/skills --skill frontend-design
+```
+
+#### playwright-cli
+
+浏览器自动化操作
+
+```
+npx skills add https://github.com/microsoft/playwright-cli --skill playwright-cli
 ```
 
 #### skill-creator
@@ -118,28 +156,10 @@ npx skills add https://github.com/anthropics/skills --skill skill-creator
 
 ```
 /plugin marketplace add obra/superpowers-marketplace
+/plugin install superpowers@superpowers-marketplace
 ```
 
-#### frontend-design
-
-前端设计
-
+注意：如果执行`plugin install`报错`Filename too long`可设置git支持长路径解决。
 ```
-npx skills add https://github.com/anthropics/skills --skill frontend-design
-```
-
-#### backend-development
-
-后端开发
-
-```
-npx skills add https://github.com/mrgoonie/claudekit-skills --skill backend-development
-```
-
-#### playwright-cli
-
-浏览器自动化操作
-
-```
-npx skills add https://github.com/microsoft/playwright-cli --skill playwright-cli
+git config --global core.longpaths true
 ```
