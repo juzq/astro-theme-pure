@@ -1,5 +1,5 @@
 ---
-title: Skill介绍
+title: Skill基础介绍
 publishDate: 2026-04-08
 description: skill是目前大多AI工具都支持的功能，可以扩展AI的能力。
 tags:
@@ -37,13 +37,13 @@ Skill 分为以下几种来源：
 - `/pdf document.pdf 提取第三章内容`
 - `/pptx 创建一个关于AI的演示文稿`
 
-#### Skill 查找
+#### Skill 查找与安装
 
-不确定有哪些 skill 可用？输入 `/` 可以看到所有可用 skill 的列表。
+可以通过[skills.sh](https://www.skills.sh/)来查找并安装skill。
 
 ### 插件 Skill
 
-Claude 可以通过安装插件来使用更多 skill。
+Claude 还可以通过安装插件来使用更多 skill，以superpowers为例。
 
 #### 添加 marketplace
 
@@ -92,74 +92,4 @@ ln -s ~/.agents/skills ~/.claude/skills
 
 ```
 MSYS=winsymlinks:nativestrict ln -s /c/Users/<name>/.agents/skills /c/Users/<name>/.claude/skills
-```
-
-### 常用skill
-
-#### backend-development
-
-后端开发
-
-```
-npx skills add https://github.com/mrgoonie/claudekit-skills --skill backend-development
-```
-
-#### claude-hud
-
-在命令行显示模型、上下文、步骤、token等信息
-
-```
-/plugin marketplace add jarrodwatts/claude-hud
-```
-
-- Minimax用量查询：
-  ```
-  curl --location 'https://www.minimaxi.com/v1/token_plan/remains' \
-  --header 'Authorization: Bearer <API Key>' \
-  --header 'Content-Type: application/json'
-  ```
-#### find-skills
-
-从[skills.sh](https://skills.sh/)中查找skill并自动安装。
-
-```
-npx skills add https://github.com/vercel-labs/skills --skill find-skills
-```
-
-#### frontend-design
-
-前端设计
-
-```
-npx skills add https://github.com/anthropics/skills --skill frontend-design
-```
-
-#### playwright-cli
-
-浏览器自动化操作
-
-```
-npx skills add https://github.com/microsoft/playwright-cli --skill playwright-cli
-```
-
-#### skill-creator
-
-创造自定义技能
-
-```
-npx skills add https://github.com/anthropics/skills --skill skill-creator
-```
-
-#### superpowers
-
-全能开发：项目规划、代码编写、code review 等，拆解做产品的开发步骤。
-
-```
-/plugin marketplace add obra/superpowers-marketplace
-/plugin install superpowers@superpowers-marketplace
-```
-
-注意：如果执行`plugin install`报错`Filename too long`可设置git支持长路径解决。
-```
-git config --global core.longpaths true
 ```
