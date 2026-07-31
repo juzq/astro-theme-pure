@@ -68,7 +68,11 @@ claude --version
 ##### 关闭自动更新
 
 ```
-"DISABLE_AUTOUPDATER": "1"
+{
+  "env": {
+    "DISABLE_AUTOUPDATER": "1"
+    }
+}
 ```
 
 #### 启动对话
@@ -99,4 +103,3 @@ claude --dangerously-skip-permissions # 跳过危险权限确认
 ```
 
 可以直接告诉 AI 要操作哪个文件，更加高效。
-
