@@ -8,6 +8,39 @@ tags:
 
 ## 终端
 
+如果在`/etc/passwd`中指定了登录shell为bash，那么登录后就可以在终端中使用。
+
+### 导出命令
+
+使用`export`命令，可在当前终端中定义环境变量，并传递到子进程中。
+
+```bash
+export variable=value
+```
+
+### 命令别名
+
+使用`alias`命令，可在当前终端中定义命令别名。
+
+```bash
+alias nickname="command"
+```
+
+- 如果command包含空格，必须要加""，否则可省略。
+
+### 登录生效
+
+如果命令需要登录后自动生效，需要将命令添加到`~/.bashrc`。
+
+- Ubuntu中，可将alias别名写到`~/.bash_aliases`，等同于`~/.bashrc`
+
+#### 当前会话立即生效
+
+如果需要将`.bashrc`在当前会话中生效，可使用source命令：
+
+```bash
+source ~/.bashrc
+```
 
 ## 脚本
 
@@ -145,4 +178,3 @@ done
 name(){
     <statement>
 }
-```
