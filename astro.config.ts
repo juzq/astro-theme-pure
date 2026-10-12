@@ -72,25 +72,19 @@ export default defineConfig({
         dark: 'github-dark'
       },
       transformers: [
-        // Two copies of @shikijs/types (one under node_modules
-        // and another nested under @astrojs/markdown-remark → shiki).
+        // Two copies of @shikijs/types used to clash (one under node_modules
+        // and another nested under @astrojs/markdown-remark → shiki); the
+        // surrounding custom transformers below bridge the gap with
+        // `as never` casts where needed.
         // Official transformers
-        // @ts-expect-error
         transformerNotationDiff(),
-        // @ts-expect-error
         transformerNotationHighlight(),
-        // @ts-expect-error
         transformerRemoveNotationEscape(),
         // Custom transformers
-        // @ts-expect-error
         updateStyle(),
-        // @ts-expect-error
         addTitle(),
-        // @ts-expect-error
         addLanguage(),
-        // @ts-expect-error
         addCopyButton(2000), // timeout in ms
-        // @ts-expect-error
         addCollapse(15) // max lines that needs to collapse
       ]
     }
@@ -104,31 +98,49 @@ export default defineConfig({
     AstroPureIntegration(config)
   ],
 
+  // [Fonts]
+  // Local Satoshi fonts (woff2 under src/assets/fonts/) — switched from
+  // fontshare() to local() so the build doesn't depend on cdn.fontshare.com
+  // reachability from the dev environment. In Astro 7 the `fonts` API moved
+  // out of `experimental` and is now a top-level config option.
+  fonts: [
+    {
+      provider: fontProviders.local(),
+      name: 'Satoshi',
+      cssVariable: '--font-satoshi',
+      fallbacks: ['sans-serif'],
+      options: {
+        variants: [
+          {
+            src: ['./src/assets/fonts/Satoshi-Regular.woff2'],
+            weight: 400,
+            style: 'normal'
+          },
+          {
+            src: ['./src/assets/fonts/Satoshi-Italic.woff2'],
+            weight: 400,
+            style: 'italic'
+          },
+          {
+            src: ['./src/assets/fonts/Satoshi-Medium.woff2'],
+            weight: 500,
+            style: 'normal'
+          },
+          {
+            src: ['./src/assets/fonts/Satoshi-MediumItalic.woff2'],
+            weight: 500,
+            style: 'italic'
+          }
+        ]
+      }
+    }
+  ],
+
   // [Experimental]
   experimental: {
     // Allow compatible editors to support intellisense features for content collection entries
     // https://docs.astro.build/en/reference/experimental-flags/content-intellisense/
-    contentIntellisense: true,
-    // Enable SVGO optimization for SVG assets
-    // https://docs.astro.build/en/reference/experimental-flags/svg-optimization/
-    svgo: true,
-    // Enable font preloading and optimization
-    // https://docs.astro.build/en/reference/experimental-flags/fonts/
-    fonts: [
-      {
-        provider: fontProviders.fontshare(),
-        name: 'Satoshi',
-        cssVariable: '--font-satoshi',
-        // Default included:
-        // weights: [400],
-        // styles: ["normal", "italics"],
-        // subsets: ["cyrillic-ext", "cyrillic", "greek-ext", "greek", "vietnamese", "latin-ext", "latin"],
-        // fallbacks: ["sans-serif"],
-        styles: ['normal', 'italic'],
-        weights: [400, 500],
-        subsets: ['latin']
-      }
-    ]
+    contentIntellisense: true
   },
   // ... 其他配置
   vite: {

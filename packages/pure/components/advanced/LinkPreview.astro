@@ -16,10 +16,13 @@ const { href, hideMedia = false, zoomable = true } = Astro.props
 
 const meta = await parseOpenGraph(href)
 const domain = meta?.url ? new URL(meta.url).hostname.replace('www.', '') : ''
+// Astro 7's JSX parser forbids mixing logical (`&&`) and ternary (`?:`)
+// operators in the same expression; pre-compute the conditional fragment.
+const hasMeta = meta != null && meta.title != null
 ---
 
 {
-  meta && meta.title ? (
+  hasMeta ? (
     <div class='not-prose link-preview-container my-2 flex justify-center sm:my-4'>
       <article
         class:list={[

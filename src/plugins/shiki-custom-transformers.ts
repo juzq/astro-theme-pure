@@ -22,8 +22,12 @@ export const updateStyle = (): ShikiTransformer => {
   return {
     name: 'shiki-transformer-update-style',
     pre(node) {
-      const container = h('pre', node.children)
-      node.children = [container]
+      // Shiki 4 bundles its own copy of @types/hast which is structurally
+      // incompatible with the @types/hast resolved at the project root.
+      // The runtime values are interchangeable; cast through `never[]` to
+      // bridge the two declarations.
+      const container = h('pre', node.children as never[])
+      node.children = [container as never]
       node.tagName = 'div'
     }
   }
@@ -64,7 +68,8 @@ export const addTitle = (): ShikiTransformer => {
         },
         meta.title.toString()
       )
-      node.children.unshift(div)
+      // See updateStyle() for why this is cast to `never`.
+      node.children.unshift(div as never)
     }
   }
 }
@@ -79,7 +84,8 @@ export const addLanguage = (): ShikiTransformer => {
         { class: 'language ps-1 pe-3 text-sm bg-muted text-muted-foreground' },
         this.options.lang
       )
-      node.children.push(span)
+      // See updateStyle() for why this is cast to `never`.
+      node.children.push(span as never)
     }
   }
 }
@@ -115,7 +121,8 @@ export const addCopyButton = (timeout?: number): ShikiTransformer => {
           ])
         ]
       )
-      node.children.push(button)
+      // See updateStyle() for why this is cast to `never`.
+      node.children.push(button as never)
     }
   }
 }
@@ -145,8 +152,9 @@ export const addCollapse = (displayLineCount?: number): ShikiTransformer => {
           h('span', { class: 'desc' }, ' code')
         ]
       )
-      node.children.push(collapse)
-      node.children.push(h('div', { class: 'collapse-fade' }))
+      // See updateStyle() for why this is cast to `never`.
+      node.children.push(collapse as never)
+      node.children.push(h('div', { class: 'collapse-fade' }) as never)
     }
   }
 }

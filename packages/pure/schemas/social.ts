@@ -2,20 +2,27 @@ import { z } from 'astro/zod'
 
 import { socialLinks } from '../types/constants'
 
+// Object (not `z.record`) so the inferred TypeScript shape is a partial
+// record: users only have to provide the platforms they actually use.
+// `.partial()` makes every key optional at the type level, while the
+// per-key schema still validates that any provided value is a valid URL.
 export const SocialLinksSchema = () =>
   z
-    .record(
-      z.enum(socialLinks),
-      // Link to the respective social profile for this site
-      z.string().url()
+    .object(
+      Object.fromEntries(socialLinks.map((key) => [key, z.string().url().optional()])) as {
+        [K in (typeof socialLinks)[number]]?: z.ZodOptional<z.ZodString>
+      }
     )
+    .partial()
     .transform((links) => {
+      // Zod 4 narrows the indexed access to `unknown` for partial objects;
+      // narrow back to `string` after the truthiness guard.
       const labelledLinks: Partial<Record<keyof typeof links, { label: string; url: string }>> = {}
       for (const _k in links) {
         const key = _k as keyof typeof links
-        const url = links[key]
-        if (!url) continue
-        const label = {
+        const rawUrl = links[key]
+        if (typeof rawUrl !== 'string') continue
+        const label: string | undefined = {
           github: 'GitHub',
           gitlab: 'GitLab',
           discord: 'Discord',
@@ -35,7 +42,10 @@ export const SocialLinksSchema = () =>
           coolapk: 'Coolapk',
           netease: 'NetEase'
         }[key]
-        labelledLinks[key] = { label, url }
+        // The label table above covers every key in `socialLinks`, so an
+        // unknown platform falls through to `undefined`; skip it.
+        if (!label) continue
+        labelledLinks[key] = { label, url: rawUrl }
       }
       return labelledLinks
     })

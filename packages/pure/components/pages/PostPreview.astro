@@ -15,26 +15,52 @@ const { post, detailed = false, class: className } = Astro.props
 const { id, data } = post
 const { remarkPluginFrontmatter } = await render(post)
 const postDate = data.updatedDate ?? data.publishDate
+const hasHeroImage = data.heroImage != null
+const heroColor = hasHeroImage ? data.heroImage.color : undefined
+
+// Astro 7's JSX parser forbids mixing logical (`&&`/`||`) and coalesce
+// (`??`/`?.`/`?:`) operators in a single expression. Pre-compute the
+// class names and conditional fragments below so the JSX stays clean.
+
+// Inline custom-property overrides when a hero image with a `color` is present.
+const showCover = detailed && hasHeroImage && heroColor != null
+const coverStyle = showCover
+  ? `--preview-highlight:color-mix(in srgb,${heroColor} 40%,hsl(var(--foreground)/var(--un-text-opacity,1)));\n    --preview-highlight-bg:hsl(from ${heroColor} h s l/20%)`
+  : undefined
+
+const linkClass = cn(
+  'block w-full relative group rounded-2xl border bg-background transition-colors ease-in-out px-5 py-2.5 hover:bg-muted hover:text-primary',
+  detailed ? 'max-sm:px-4 sm:py-5' : null,
+  detailed && hasHeroImage ? 'max-md:pt-24' : null
+)
+
+const descClass = hasHeroImage
+  ? 'line-clamp-2 text-sm text-muted-foreground sm:line-clamp-3 sm:me-24'
+  : 'line-clamp-2 text-sm text-muted-foreground sm:line-clamp-3'
+
+const titleClass = detailed ? 'font-medium' : ''
+const bodyRowClass = detailed
+  ? 'relative flex flex-col gap-1'
+  : 'relative flex flex-col gap-1 sm:flex-row sm:items-center'
+const titleRowClass = detailed ? 'flex justify-between flex-grow' : 'flex justify-between flex-grow'
+
+const showCoverImage = detailed && hasHeroImage
+const showLanguage = data.language != null
+const showTags = data.tags.length > 0
+const showDraft = data.draft === true
 ---
 
 <li
   class={cn('post-preview', className)}
-  style={detailed &&
-    data.heroImage?.color &&
-    `--preview-highlight:color-mix(in srgb,${data.heroImage.color} 40%,hsl(var(--foreground)/var(--un-text-opacity,1)));
-    --preview-highlight-bg:hsl(from ${data.heroImage.color} h s l/20%)`}
+  style={coverStyle}
 >
   <a
-    class={cn(
-      'block w-full relative group rounded-2xl border bg-background transition-colors ease-in-out px-5 py-2.5 hover:bg-muted hover:text-primary',
-      detailed && 'max-sm:px-4 sm:py-5',
-      detailed && data.heroImage && 'max-md:pt-24'
-    )}
+    class={linkClass}
     href={`/blog/${id}`}
     data-astro-prefetch
   >
     {
-      detailed && data.heroImage && (
+      showCoverImage && (
         <Image
           alt={data.heroImage.alt || data.title}
           class='cover-image absolute end-0 top-0 z-0 h-2/3 w-full rounded-2xl object-cover opacity-50 transition-opacity duration-300 group-hover:opacity-70 md:h-full md:w-3/5'
@@ -43,16 +69,13 @@ const postDate = data.updatedDate ?? data.publishDate
         />
       )
     }
-    <div
-      class={cn('relative flex flex-col gap-1', !detailed && 'sm:flex-row sm:items-center')}
-      style='z-index:1'
-    >
+    <div class={bodyRowClass} style='z-index:1'>
       <FormattedDate class='min-w-[95px] text-xs' date={postDate} />
 
       {/* title */}
-      <div class='flex justify-between flex-grow'>
-        <div class={detailed && 'font-medium'}>
-          {data.draft && <span class='text-red-500'>(Draft) </span>}
+      <div class={titleRowClass}>
+        <div class={titleClass}>
+          {showDraft && <span class='text-red-500'>(Draft) </span>}
           {data.title}
         </div>
         <svg
@@ -81,12 +104,7 @@ const postDate = data.updatedDate ?? data.publishDate
         detailed && (
           <>
             {/* desc */}
-            <p
-              class={cn(
-                'line-clamp-2 text-sm text-muted-foreground sm:line-clamp-3',
-                data.heroImage && 'sm:me-24'
-              )}
-            >
+            <p class={descClass}>
               {data.description}
             </p>
             <div class='py-2 flex items-center gap-2 text-sm italic leading-4 text-muted-foreground'>
@@ -96,14 +114,14 @@ const postDate = data.updatedDate ?? data.publishDate
                 {remarkPluginFrontmatter.minutesRead}
               </span>
               {/* language */}
-              {data.language && (
+              {showLanguage && (
                 <span class='flex items-center gap-1'>
                   <Icon name='earth' class='size-4' />
                   {data.language}
                 </span>
               )}
             </div>
-            {data.tags.length > 0 && (
+            {showTags && (
               <object title='Tags' aria-label='Tags' aria-labelledby='Tags'>
                 <ul class='tag-list mt-1 flex gap-2'>
                   {data.tags.map((tag: string) => (

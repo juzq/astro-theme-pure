@@ -47,7 +47,8 @@ export function createCommentNotationTransformer(
       }
 
       data._shiki_notation ??= parseComments(
-        lines,
+        // See shared-notation-map.ts for why this is cast to `never[]`.
+        lines as never[],
         ['jsx', 'tsx'].includes(this.options.lang),
         matchAlgorithm
       )
@@ -56,12 +57,13 @@ export function createCommentNotationTransformer(
       for (const comment of parsed) {
         if (comment.info[1].length === 0) continue
 
-        let lineIdx = lines.indexOf(comment.line)
+        // See shared-notation-map.ts for why these casts to `never` exist.
+        let lineIdx = lines.indexOf(comment.line as never)
         if (comment.isLineCommentOnly && matchAlgorithm !== 'v1') lineIdx++
 
         let replaced = false
         comment.info[1] = comment.info[1].replace(regex, (...match) => {
-          if (onMatch.call(this, match, comment.line, comment.token, lines, lineIdx)) {
+          if (onMatch.call(this, match, comment.line, comment.token, lines as never[], lineIdx)) {
             replaced = true
             return ''
           }
@@ -115,7 +117,8 @@ export function createCommentNotationTransformer(
       }
 
       for (const line of linesToRemove) {
-        const index = code.children.indexOf(line)
+        // See shared-notation-map.ts for why these casts to `never` exist.
+        const index = code.children.indexOf(line as never)
         const nextLine = code.children[index + 1]
         let removeLength = 1
         if (nextLine?.type === 'text' && nextLine?.value === '\n') removeLength = 2

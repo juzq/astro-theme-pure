@@ -14,13 +14,21 @@ const {
   remarkPluginFrontmatter
 } = Astro.props
 
+// Astro 7's JSX parser forbids mixing logical (`&&`/`||`) and coalesce
+// (`??`/`?.`/`?:`) operators. Pre-compute conditional fragments so the
+// markup stays clean.
+const showHeroImage = heroImage != null
+const showUpdatedDate = updatedDate != null
+const showLanguage = language != null
+const showTags = Array.isArray(tags) && tags.length > 0
+
 const dateTimeOptions: Intl.DateTimeFormatOptions = {
   month: 'short'
 }
 ---
 
 {
-  heroImage && (
+  showHeroImage && (
     <div class='hero-image relative mb-6'>
       <Image
         alt={heroImage.alt || title}
@@ -50,7 +58,7 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
       <Icon name='calendar' class='size-5' />
       <FormattedDate class='font-sans' date={publishDate} dateTimeOptions={dateTimeOptions} />
       {
-        updatedDate && (
+        showUpdatedDate && (
           <div class='flex items-center gap-1'>
             <span> / </span>
             <span>
@@ -72,7 +80,7 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
     </div>
     {
       // Language
-      language && (
+      showLanguage && (
         <span class='flex items-center gap-1'>
           <Icon name='earth' class='size-5' />
           {language}
@@ -81,7 +89,7 @@ const dateTimeOptions: Intl.DateTimeFormatOptions = {
     }
     {
       // Tags
-      !!tags?.length && (
+      showTags && (
         <span class='flex items-center gap-1'>
           <Icon name='hashtag' class='size-5' />
           {tags.map((tag: string, i: number) => (

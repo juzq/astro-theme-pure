@@ -37,14 +37,15 @@
     "./libs": "./libs/index.ts"
   },
   "dependencies": {
-    "@astrojs/mdx": "^4.3.13",
-    "@astrojs/sitemap": "^3.6.0",
+    "@astrojs/mdx": "^7.0.5",
+    "@astrojs/sitemap": "^3.7.3",
     "@pagefind/default-ui": "^1.4.0",
-    "@unocss/reset": "^66.5.10",
-    "astro": "^5.16.6",
+    "@unocss/reset": "^66.7.5",
+    "astro": "^7.1.6",
     "hast-util-select": "^6.0.4",
     "node-html-parser": "^7.0.1",
     "pagefind": "^1.4.0",
-    "unocss": "^66.5.10"
+    "rehype": "^13.0.2",
+    "unocss": "^66.7.5"
   }
 }

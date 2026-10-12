@@ -13,10 +13,13 @@ interface Props {
 }
 
 const { title, headings, view, comment: enableComment, ...props } = Astro.props
+// Astro 7's JSX parser forbids mixing logical (`&&`) and coalesce (`?.`)
+// operators. Pre-compute the conditional fragment.
+const showTOC = Array.isArray(headings) && headings.length > 0
 ---
 
 <PageLayout meta={{ title }} {...props}>
-  {headings?.length && <TOC headings={headings} slot='sidebar' />}
+  {showTOC && <TOC headings={headings} slot='sidebar' />}
 
   <Fragment slot='header'>
     <h1 class='text-2xl font-medium sm:mb-2 sm:text-3xl'>{title}</h1>

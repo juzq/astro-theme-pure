@@ -115,7 +115,10 @@ export function transformerRemoveNotationEscape(): ShikiTransformer {
         }
       }
 
-      replace(hast)
+      // Shiki 4 bundles its own copy of @types/hast which is structurally
+      // incompatible with the @types/hast resolved at the project root; cast
+      // through `never` to bridge the two declarations.
+      replace(hast as never)
       return hast
     }
   }

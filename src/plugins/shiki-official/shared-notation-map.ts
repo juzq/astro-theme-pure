@@ -36,7 +36,11 @@ export function transformerNotationMap(
       const lineNum = Number.parseInt(range.slice(1), 10)
 
       for (let i = index; i < Math.min(index + lineNum, lines.length); i++) {
-        this.addClassToHast(lines[i], classMap[match])
+        // Shiki 4 bundles its own copy of @types/hast which is structurally
+        // incompatible with the @types/hast resolved at the project root.
+        // The runtime values are interchangeable; cast through `never` to
+        // bridge the two declarations.
+        this.addClassToHast(lines[i] as never, classMap[match])
       }
 
       if (classActivePre) this.addClassToHast(this.pre, classActivePre)
