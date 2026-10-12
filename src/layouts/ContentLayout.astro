@@ -43,7 +43,9 @@ const { meta, highlightColor, back = '/', ...props } = Astro.props
       <div
         id='content'
         class={cn(
-          'max-w-none animate mt-8 md:min-w-[45ch] overflow-x-hidden',
+          // `[&>*:first-child]:mt-0` 清掉 prose 给首元素（标题）加的上边距，
+          // 否则分隔线与正文之间的实际间距由标题 margin 决定，改 mt-* 无效。
+          'max-w-none animate mt-1.5 md:min-w-[45ch] overflow-x-hidden [&>*:first-child]:mt-0',
           integ.typography.class
         )}
       >
